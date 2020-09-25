@@ -1,0 +1,25 @@
+# Git
+.git/
+.gitignore
+
+# Node & npm
+node_modules/
+package-lock.json
+
+# Ignore files with sensitive environment variables
+.env
+.env.test
+
+# cache
+.cache/
+
+# Ignore IDE configuration files
+.idea/
+.vscode/
+
+# Logs
+logs/
+*.log
+
+# OS file
+.DS_Store

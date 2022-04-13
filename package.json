@@ -1,6 +1,6 @@
 {
   "name": "@koppa/core",
-  "version": "1.0.1",
+  "version": "0.0.1",
   "description": "Koppa.js is a progressive client-side rendering framework for building single page applications which gets along without virtual DOM.",
   "main": "./src/index.js",
   "repository": {
@@ -19,8 +19,12 @@
     "rendering",
     "core"
   ],
-  "author": "MightyLopers, Bastian Bensch (Sortex)",
-  "homepage": "https://github.com/koppajs/core#readme",
+  "author": "Linuxcode, Bastian Bensch (Sortex)",
+  "homepage": "https://koppajs.org",
   "license": "MIT",
-  "dependencies": {}
+  "devDependencies": {
+    "eslint": "^8.11.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4"
+  }
 }

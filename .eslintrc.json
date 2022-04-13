@@ -1,0 +1,23 @@
+
+{
+    "env": {
+      "browser": true,
+      "es2021": true
+    },
+    "extends": [
+        "airbnb-base"
+    ],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "plugins": [],
+    "rules": {
+      "indent": ["error",2],
+      "quotes": ["error","single"],
+      "semi": ["error","always"],
+      "comma-dangle": ["error", "never"],
+      "max-len": ["error", { "code": 120 }],
+      "no-param-reassign": 0
+    }
+  }

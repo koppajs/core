@@ -1,52 +1,152 @@
+<div align="center">
+<a href="https://koppajs.org" target="_blank"><img width="180" src="https://koppajs.org/images/logo-min.png" alt="Koppa.js Logo"></a>
+</div>
 
-<p align="center">
-<a href="https://koppajs.org" target="_blank"><img width="100" src="https://koppajs.org/images/koppa_logo.png" alt="Koppa logo"></a>
-</p>
+<br>
 
-<p align="center">
-<a href="https://npmcharts.com/compare/@koppa/core?minimal=true" target="_blank"><img src="https://img.shields.io/npm/dm/@koppa/core?color=%2333d4df" alt="Downloads"></a>
-<a href="https://www.npmjs.com/package/@koppa/core"><img src="https://img.shields.io/npm/v/@koppa/core?color=%2395c6f8" alt="Version"></a>
-<a href="http://opensource.org/licenses/MIT" target="_blank"><img src="https://img.shields.io/npm/l/@koppa/core?color=%23ecbbd9" alt="License"></a>
-</p>
+<div align="center">
+    <a href="https://npmcharts.com/compare/@koppa/core?minimal=true" target="_blank"><img src="https://badgen.net/npm/dm/@koppa/core?scale=1&color=69DF20" alt="Downloads"></a>
+    <a href="https://www.npmjs.com/package/@koppa/core"><img src="https://badgen.net/npm/v/@koppa/core?scale=1&color=4AC56D" alt="Version"></a>
+    <a href="http://opensource.org/licenses/MIT" target="_blank"><img src="https://badgen.net/badge/license/MIT/?scale1&color=2eaad1" alt="License"></a>
+</div>
 
-## Introduction
+<br><br><br>
 
-Koppa.js is a progressive client-side rendering framework for building single page applications which gets along without virtual **DOM**. It consists of an **easy to use** core library that covers the most important functionalities of a single page application.
+# Koppa.js, What is this?
+Koppa.js is a progressive client-side rendering framework for creating user interfaces that do **not require a virtual DOM**.  
+It consists of an **easy-to-use** core library that focuses on managing the individual components and the viewport.  
+Koppa.js is **highly modular** and thus can be used for small SinglePages or even complex applications.
 
-## Overview
+<br><br><br>
+
+# Overview
 
 Here is a small list what Koppa.js **Core** offers.
 
-1. Pages, Components (single File Templates)
-2. JS-Module (extend the functionality)
-3. routing
-4. templating
-5. live data and watching
+1. Components (single File Templates)
+2. Modules (extend the functionality)
+3. Router (routing content to URL)
+4. Store (easy local & session Storage handling)
+5. Fetcher (easy use of Fetch-API)
+6. Templating HTML
+7. Reactive live data
 
 and many more...
 
-## Ecosystem
+<br><br><br>
 
-| Project       | Status                             | Description                     |
-|---------------|------------------------------------|---------------------------------|
-| [core]        | [![core-status]][core-package]     | Single-page rendering framework |
-| [cli]         | [![cli-status]][cli-package]       | Project scaffolding    |
+# Ecosystem
+
+| Project         | Status                                       | Description                       |
+|-----------------|----------------------------------------------|-----------------------------------|
+| [core]          | [![core-status]][core-package]               | Framework Core                    |
+| [componenter]   | *in progress, coming soon*                   | Component Module                  |
+| [documentation] | *in progress, coming soon*                   | Documentation                     |
+| [get-started]   | [![get-started-status]][get-started-package] | Git-Repository to start a project |
 
 
 [core]: https://github.com/koppajs/core
-[core-status]: https://img.shields.io/npm/v/@koppa/core?color=%2395c6f8
+[core-status]: https://badgen.net/npm/v/@koppa/core?scale=1&color=69DF20
 [core-package]: https://npmjs.com/package/@koppa/core
 
-[cli]: https://github.com/koppajs/cli
-[cli-status]: https://img.shields.io/npm/v/@koppa/cli?color=%2395c6f8
-[cli-package]: https://npmjs.com/package/@koppa/cli
+[componenter]: https://github.com/koppajs/componenter
 
-## Documentation
+[documentation]: https://github.com/koppajs/documentation
 
-coming soon...
+[get-started]: https://github.com/koppajs/get-started
+[get-started-status]: https://badgen.net/npm/v/@koppa/get-started?scale=1&color=69DF20
+[get-started-package]: https://npmjs.com/package/@koppa/get-started
 
-## License
+<br><br><br>
 
-[MIT](http://opensource.org/licenses/MIT)
+# Getting Started
 
-Copyright (c) 2020-present, MightyLopers, Bastian Bensch (Sortex)
+## For absolute beginners
+You can easy use the **koppa-core.2.0.0.min.js** in your HTML with the **script-tag**.
+
+<br>
+
+index.html
+```html
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title>Get Started with Koppa.js</title>
+    <script src="https://koppajs.s3.eu-central-1.amazonaws.com/koppa-core.2.0.0.min.js"></script>
+  </head>
+
+  <body>
+    <script>
+      koppa.take('app-view', './app-view.html');
+
+      koppa('app-view');
+    </script>
+  </body>
+</html>
+```
+
+<br>
+
+app-view.html
+```html
+<template>
+    <header>{{title}}</header>
+    <nav>Nav</nav>
+    <main>Main</main>
+    <footer>Footer</footer>
+</template>
+
+<script>
+    data: {
+        title: 'Get Started with Koppa.js'
+    }
+</script>
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+
+    html, body {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+
+    app-view {
+        display: block;
+        width: 100%;
+        height: 100%;
+        background-color: #ddd;
+    }
+</style>
+```
+
+<br>
+
+## For pros
+
+### Important!
+This is something you should have dealt with before.
+
+1. [Docker](https://www.docker.com/)
+2. [Node.js](https://nodejs.org/en/)
+3. [Webpack](https://webpack.js.org/)
+
+We will only teach you how to use Koppa.js, not the other things.
+
+<br>
+
+We have a git-repository that you can easily clone.  
+This is the best and easiest way to start a full development project with **Koppa.js**.  
+It provides everything you need.  
+
+[- go to git ->](https://github.com/koppajs/get-started)
+
+<br>
+
+---
+
+© 2020-present | Bastian Bensch

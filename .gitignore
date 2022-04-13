@@ -5,20 +5,12 @@
 node_modules/
 package-lock.json
 
-# Ignore files with sensitive environment variables
-.env
-.env.test
-
-# cache
+# Cache
 .cache/
-
-# Ignore IDE configuration files
-.idea/
-.vscode/
 
 # Logs
 logs/
 *.log
 
-# OS file
+# OS files
 .DS_Store

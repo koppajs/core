@@ -42,7 +42,7 @@ and many more...
 | [core]          | [![core-status]][core-package]               | Framework Core                    |
 | [componenter]   | *in progress, coming soon*                   | Component Module                  |
 | [documentation] | *in progress, coming soon*                   | Documentation                     |
-| [get-started]   | [![get-started-status]][get-started-package]                  | Git-Repository to start a project |
+| [get-started]   | [![get-started-status]][get-started-package] | Git-Repository to start a project |
 
 
 [core]: https://github.com/koppajs/core

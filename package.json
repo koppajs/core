@@ -1,5 +1,5 @@
 {
-  "name": "@koppa/core",
+  "name": "@koppajs/core",
   "version": "2.0.0",
   "description": "Koppa.js is a progressive client-side rendering framework for creating user interfaces that do **not require a virtual DOM**.",
   "main": "./src/index.js",

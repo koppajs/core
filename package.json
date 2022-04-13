@@ -1,7 +1,7 @@
 {
   "name": "@koppa/core",
-  "version": "0.0.1",
-  "description": "Koppa.js is a progressive client-side rendering framework for building single page applications which gets along without virtual DOM.",
+  "version": "2.0.0",
+  "description": "Koppa.js is a progressive client-side rendering framework for creating user interfaces that do **not require a virtual DOM**.",
   "main": "./src/index.js",
   "repository": {
     "type": "git",

@@ -5,8 +5,8 @@
 <br>
 
 <div align="center">
-    <a href="https://npmcharts.com/compare/@koppa/core?minimal=true" target="_blank"><img src="https://badgen.net/npm/dm/@koppa/core?scale=1&color=69DF20" alt="Downloads"></a>
-    <a href="https://www.npmjs.com/package/@koppa/core"><img src="https://badgen.net/npm/v/@koppa/core?scale=1&color=4AC56D" alt="Version"></a>
+    <a href="https://npmcharts.com/compare/@koppajs/core?minimal=true" target="_blank"><img src="https://badgen.net/npm/dm/@koppajs/core?scale=1&color=69DF20" alt="Downloads"></a>
+    <a href="https://www.npmjs.com/package/@koppajs/core"><img src="https://badgen.net/npm/v/@koppajs/core?scale=1&color=4AC56D" alt="Version"></a>
     <a href="http://opensource.org/licenses/MIT" target="_blank"><img src="https://badgen.net/badge/license/MIT/?scale1&color=2eaad1" alt="License"></a>
 </div>
 
@@ -46,16 +46,16 @@ and many more...
 
 
 [core]: https://github.com/koppajs/core
-[core-status]: https://badgen.net/npm/v/@koppa/core?scale=1&color=69DF20
-[core-package]: https://npmjs.com/package/@koppa/core
+[core-status]: https://badgen.net/npm/v/@koppajs/core?scale=1&color=69DF20
+[core-package]: https://npmjs.com/package/@koppajs/core
 
 [componenter]: https://github.com/koppajs/componenter
 
 [documentation]: https://github.com/koppajs/documentation
 
 [get-started]: https://github.com/koppajs/get-started
-[get-started-status]: https://badgen.net/npm/v/@koppa/get-started?scale=1&color=69DF20
-[get-started-package]: https://npmjs.com/package/@koppa/get-started
+[get-started-status]: https://badgen.net/npm/v/@koppajs/get-started?scale=1&color=69DF20
+[get-started-package]: https://npmjs.com/package/@koppajs/get-started
 
 <br><br><br>
 

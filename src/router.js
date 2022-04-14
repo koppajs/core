@@ -1,6 +1,6 @@
 const router = ($) => {
   const routes = [];
-  const currentRoute = null;
+  let currentRoute = null;
 
   const popStateEvent = new Event('popstate', null);
 
@@ -94,6 +94,8 @@ const router = ($) => {
       currentComponent = 'error-404';
       this.html(`<${currentComponent}></${currentComponent}>`);
     }
+
+    currentRoute = route;
   }
 
   function setListener(instance) {

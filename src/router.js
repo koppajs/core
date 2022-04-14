@@ -28,7 +28,8 @@ const router = ($) => {
   };
 
   const findRoute = () => {
-    if (!routes.length) return;
+    let ret = false;
+    if (!routes.length) return ret;
 
     const pathname = clearSlashes(window.location.pathname);
     const pathnameParts = pathname.split('/');
@@ -38,28 +39,27 @@ const router = ($) => {
       const pathParts = route.path.split('/');
 
       if (pathnameParts.length === pathParts.length) {
-        pathParts.entries().forEach((value, index) => {
+        pathParts.forEach((value, index) => {
           if (value.charAt(0) === ':') {
             const valueParts = value.slice(1, value.length - 1).split('<');
             const pattern = new RegExp(valueParts[1], 'g');
             if (pattern.test(pathnameParts[index])) {
               route.params[valueParts[0]] = pathnameParts[index];
-            } else return null;
-          } else if (pathnameParts[index] !== value) {
-            return null;
+            }
           }
 
           if (index === pathParts.length - 1) {
-            return route;
+            ret = route;
           }
-          return null;
         });
       }
     });
+
+    return ret;
   };
 
   // routingHandler manage the content change inside the router view and component refinding
-  const routingHandler = async (instance) => {
+  async function routingHandler(instance) {
     const route = findRoute();
     let currentComponent = true;
 
@@ -83,7 +83,7 @@ const router = ($) => {
       }
 
       if (currentComponent.isString) {
-        if ($.components[currentComponent] === undefined) {
+        if ($.component[currentComponent] === undefined) {
           currentComponent = 'error-404';
           this.html(`<${currentComponent}></${currentComponent}>`);
         } else {
@@ -94,13 +94,13 @@ const router = ($) => {
       currentComponent = 'error-404';
       this.html(`<${currentComponent}></${currentComponent}>`);
     }
-  };
+  }
 
-  const setListener = (instance) => {
-    window.addEventListener('popstate', () => {
-      routingHandler.call(this, instance);
+  function setListener(instance) {
+    window.addEventListener('popstate', async () => {
+      await routingHandler.call(this, instance);
     }, true);
-  };
+  }
 
   const add = (route) => {
     let isAdded = false;

@@ -1,5 +1,6 @@
 import utils from './utils';
 import mediator from './mediator';
+import module from './module';
 
 const instance = (() => {
   const instances = {};

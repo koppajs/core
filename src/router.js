@@ -94,8 +94,7 @@ const router = ($) => {
       currentComponent = 'error-404';
       this.html(`<${currentComponent}></${currentComponent}>`);
     }
-
-    currentRoute = route;
+      currentRoute = route;
   }
 
   function setListener(instance) {

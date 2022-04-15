@@ -48,8 +48,6 @@ const prototypeExtensions = (() => {
     html: DOMExtensions.html,
     attr: DOMExtensions.attr
   });
-
-  return undefined;
 })();
 
 export default prototypeExtensions;

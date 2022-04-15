@@ -33,8 +33,6 @@ Here is a small list what Koppa.js **Core** offers.
 
 and many more...
 
-https://badgen.net/github/release/babel/babel
-
 <br><br><br>
 
 # Ecosystem
@@ -56,14 +54,14 @@ https://badgen.net/github/release/babel/babel
 [documentation]: https://github.com/koppajs/documentation
 
 [get-started]: https://github.com/koppajs/get-started
-[get-started-status]: https://badgen.net/github/release/koppajs/get-started?scale1&color=2eaad1
+[get-started-status]: https://badgen.net/github/release/koppajs/get-started/?scale1&color=2eaad1
 
 <br><br><br>
 
 # Getting Started
 
 ## For absolute beginners
-You can easy use the **koppa-core.2.0.4.min.js** in your HTML with the **script-tag**.
+You can easy use the **koppa-core.2.0.5.min.js** in your HTML with the **script-tag**.
 
 <br>
 
@@ -74,7 +72,7 @@ index.html
   <head>
     <meta charset="utf-8">
     <title>Get Started with Koppa.js</title>
-    <script src="https://koppajs.s3.eu-central-1.amazonaws.com/koppa-core.2.0.4.min.js"></script>
+    <script src="https://koppajs.s3.eu-central-1.amazonaws.com/koppa-core.2.0.5.min.js"></script>
   </head>
 
   <body>

@@ -38,7 +38,7 @@ const instance = (() => {
         // add to props
         props[propsName] = currentInstance.parent.data[propsName];
       } else { // it's a direct property string or number
-        [props[propsName]] = [val[1]];
+        [props[propsName]] = [val[1] || true];
       }
 
       currentInstance.element.removeAttribute(item.name);

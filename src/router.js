@@ -38,7 +38,7 @@ const router = ($) => {
       route.params = {};
       const pathParts = route.path.split('/');
 
-      if (pathnameParts.length === pathParts.length) {
+      if (JSON.stringify(pathnameParts) === JSON.stringify(pathParts)) {
         pathParts.forEach((value, index) => {
           if (value.charAt(0) === ':') {
             const valueParts = value.slice(1, value.length - 1).split('<');

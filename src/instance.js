@@ -1,6 +1,7 @@
 import utils from './utils';
 import mediator from './mediator';
 import module from './module';
+import head from './head';
 
 const instance = (() => {
   const instances = {};
@@ -10,7 +11,7 @@ const instance = (() => {
     const template = document.createElement('template');
     template.innerHTML = templateContent;
 
-    const nodeList = template.content.getNodeList('element', (node) => node.nodeName.includes('-'));
+    const nodeList = template.content.getNodeList('element', (node) => node.localName.includes('-'));
 
     nodeList.forEach((item, index) => {
       nodeList[index].dataset.instance = `${utils.getId()}|${instanceId}`;
@@ -264,6 +265,7 @@ const instance = (() => {
           currentInstance.isStopped = true;
         },
         reConnect: currentInstance.reConnect,
+        head,
         ...module
       };
 
@@ -323,7 +325,7 @@ const instance = (() => {
 
       currentInstance.childs = {};
 
-      currentInstance.fragment.getNodeList('element', (node) => node.nodeName.includes('-')).forEach((item) => {
+      currentInstance.fragment.getNodeList('element', (node) => node.localName.includes('-')).forEach((item) => {
         currentInstance.childs[utils.getIdent(item).self] = item;
       });
 
@@ -355,7 +357,7 @@ const instance = (() => {
 
       Reflect.set(target, ident.self, currentInstance);
 
-      return true;
+      return value;
     }
   });
 })();

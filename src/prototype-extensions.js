@@ -48,6 +48,10 @@ const prototypeExtensions = (() => {
     html: DOMExtensions.html,
     attr: DOMExtensions.attr
   });
+
+  Object.defineProperties(Document.prototype, {
+    createHTML: DOMExtensions.createHTML
+  });
 })();
 
 export default prototypeExtensions;

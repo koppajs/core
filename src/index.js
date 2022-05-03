@@ -6,6 +6,7 @@ import transformer from './transformer';
 import mediator from './mediator';
 import instance from './instance';
 import component from './component';
+import head from './head';
 
 import fetcher from './fetcher';
 import store from './store';
@@ -51,6 +52,7 @@ export default (() => {
           getIdent: utils.getIdent,
           createTrigger: utils.createTrigger
         },
+        head,
         module,
         component,
         instance,

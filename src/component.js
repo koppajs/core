@@ -37,7 +37,7 @@ const component = (() => {
 
       target[property] = value;
 
-      return true;
+      return value;
     }
   });
 })();

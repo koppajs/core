@@ -6,7 +6,7 @@ const module = (() => {
     set: async (target, property, value) => {
       target[property] = value;
 
-      return true;
+      return value;
     }
   });
 })();

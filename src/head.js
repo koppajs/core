@@ -27,8 +27,6 @@ const head = (() => {
     charset: document.head.querySelector('meta[charset]')
   };
 
-  console.log(nodes);
-
   // sort nodes in DOM
   Object.keys(nodes).forEach((item) => {
     if(nodes[item] !== null) {
@@ -49,23 +47,23 @@ const head = (() => {
     refresh: nodes.refresh?.attr('content')
   };
 
-  console.log(defaultContent);
-
+  let oldContent = Object.assign({}, defaultContent);
   let currentContent = Object.assign({}, defaultContent);
 
   const set = (obj) => {
+    oldContent = currentContent;
     currentContent = {};
 
     Object.keys(nodes).forEach((item) => {
-      currentContent[item] = obj[item] || defaultContent[item] || false;
+      if (obj[item] !== undefined && obj[item] === false) {
+        currentContent[item] = obj[item] || defaultContent[item] || false;
+      } else {
+        currentContent[item] = obj[item] || oldContent[item] || defaultContent[item] || false;
+      }
     });
-  };
 
-  const get = (item) => currentContent[item];
-  
-  const update = () => {
     Object.keys(nodes).forEach((item) => {
-     if(currentContent[item] === false) { // remove
+      if(currentContent[item] === false) { // remove
         nodes[item]?.remove();
       } else if(currentContent[item] !== false && nodes[item] === null) { // create
         nodes[item] = document.createHTML(templates[item].replace(/{{content}}/, currentContent[item]));
@@ -75,10 +73,13 @@ const head = (() => {
         else if(item === 'title') nodes[item].innerHTML = currentContent[item];
       }
     });
+
+    currentContent = Object.fromEntries(Object.entries(currentContent).filter(([key, val]) => val !== false));
   };
 
+  const get = () => currentContent;
+
   return {
-    update,
     set,
     get
   };

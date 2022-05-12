@@ -275,6 +275,9 @@ const instance = (() => {
       currentInstance.props = buildProps(currentInstance);
       buildChildProps(currentInstance);
 
+      // build head data
+      head.set(script.head || {});
+      
       if (!currentInstance.data) {
         currentInstance.data = Object.assign(script.data, currentInstance.props);
       } else {
@@ -301,6 +304,7 @@ const instance = (() => {
         currentInstance.watching = buildWatchings(currentInstance, script.watching);
       }
 
+      // build instance methods
       currentInstance.pre = script.pre?.bind(currentInstance.data);
       currentInstance.created = script.created?.bind(currentInstance.data);
       currentInstance.merged = script.merged?.bind(currentInstance.data);

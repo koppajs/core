@@ -140,7 +140,7 @@ const DOMExtensions = {
   html: {
     get() {
       return (newNode) => {
-        this.innerHTML = newNode.isString ? newNode : newNode.outerHTML;
+        this.innerHTML = newNode?.isString ? newNode : newNode.outerHTML;
       };
     }
   },
@@ -149,6 +149,24 @@ const DOMExtensions = {
       return (attrName, attrValue) => {
         if (attrValue !== undefined) this.setAttribute(attrName, attrValue || 'true');
         return this.getAttribute(attrName);
+      };
+    }
+  },
+  createHTML: {
+    get() {
+      return (html) => {
+        const placeholder = document.createElement("div");
+        placeholder.innerHTML = html;
+
+        if(placeholder.children.length === 1) return placeholder.firstElementChild;
+
+        nodes = [];
+
+        while(placeholder.firstElementChild) {
+          nodes.push(placeholder.firstElementChild);
+        }
+        
+        return nodes;
       };
     }
   }

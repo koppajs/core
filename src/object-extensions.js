@@ -138,6 +138,28 @@ const objectExtensions = {
         });
       }
     }
+  },
+
+  byString: {
+    get() {
+      return (obj, strg) => {
+        let s = strg.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+        s = s.replace(/^\./, ''); // strip a leading dot
+        const a = s.split('.');
+        let o = obj;
+
+        for (let i = 0, n = a.length; i < n; i += 1) {
+          const k = a[i];
+          if (k in o) {
+            o = o[k];
+          } else {
+            return undefined;
+          }
+        }
+
+        return o;
+      };
+    }
   }
 };
 

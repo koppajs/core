@@ -18,7 +18,8 @@ const prototypeExtensions = (() => {
     toNumber: objectExtensions.toNumber,
     toBool: objectExtensions.toBool,
     getType: objectExtensions.getType,
-    watch: objectExtensions.watch
+    watch: objectExtensions.watch,
+    byString: objectExtensions.byString
   });
 
   Object.defineProperties(String.prototype, {

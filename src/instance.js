@@ -2,6 +2,7 @@ import utils from './utils';
 import mediator from './mediator';
 import module from './module';
 import head from './head';
+import watcher from './watcher';
 
 const instance = (() => {
   const instances = {};
@@ -61,23 +62,24 @@ const instance = (() => {
     });
   }
 
-  function watchHandler(propName, oldVal, newVal) {
-    // when its changed
-    if (oldVal !== newVal) {
-      const timeout = setTimeout(() => {
-        clearTimeout(timeout);
-        this.reConnect();
-      }, 2);
-    }
+  // function watchHandler(propName, oldVal, newVal) {
+  //   // when its changed
+  //   if (oldVal !== newVal) {
+  //     const timeout = setTimeout(() => {
+  //       clearTimeout(timeout);
+  //       this.reConnect();
+  //     }, 2);
+  //   }
 
-    return newVal;
-  }
+  //   return newVal;
+  // }
 
-  function buildWatchings(currentInstance, watching) {
-    watching?.forEach((item) => currentInstance.data.watch(item, watchHandler.bind(currentInstance)));
+  // function buildWatchings(currentInstance, watching) {
+  //   console.log(watching);
+  //   watching?.forEach((item) => currentInstance.data.watch(item, watchHandler.bind(currentInstance)));
 
-    return watching;
-  }
+  //   return watching;
+  // }
 
   function firstOfPropChain(curInst, propName) {
     if (curInst.parent?.data[propName] !== undefined
@@ -277,7 +279,7 @@ const instance = (() => {
 
       // build head data
       head.set(script.head || {});
-      
+
       if (!currentInstance.data) {
         currentInstance.data = Object.assign(script.data, currentInstance.props);
       } else {
@@ -301,7 +303,9 @@ const instance = (() => {
       currentInstance.data = Object.assign(currentInstance.data, script.methods);
 
       if (script.watching) {
-        currentInstance.watching = buildWatchings(currentInstance, script.watching);
+        // currentInstance.watching = buildWatchings(currentInstance, script.watching);
+        currentInstance.watching = script.watching;
+        watcher.add = currentInstance;
       }
 
       // build instance methods

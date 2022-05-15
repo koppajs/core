@@ -3,7 +3,7 @@ import mediator from './mediator';
 import module from './module';
 import head from './head';
 import watcher from './watcher';
-import { dataTypes, functionTypes, stringTypes } from './types';
+import { dataTypes } from './types';
 
 const instance = (() => {
   const instances = {};
@@ -62,25 +62,6 @@ const instance = (() => {
       childProps[currentInstance.id][propKey] = props[propKey];
     });
   }
-
-  // function watchHandler(propName, oldVal, newVal) {
-  //   // when its changed
-  //   if (oldVal !== newVal) {
-  //     const timeout = setTimeout(() => {
-  //       clearTimeout(timeout);
-  //       this.reConnect();
-  //     }, 2);
-  //   }
-
-  //   return newVal;
-  // }
-
-  // function buildWatchings(currentInstance, watching) {
-  //   console.log(watching);
-  //   watching?.forEach((item) => currentInstance.data.watch(item, watchHandler.bind(currentInstance)));
-
-  //   return watching;
-  // }
 
   function firstOfPropChain(curInst, propName) {
     if (curInst.parent?.data[propName] !== undefined
@@ -299,7 +280,6 @@ const instance = (() => {
       if (script.comp) {
         Object.entries(script.comp).forEach((entry) => {
           const [key, val] = entry;
-          console.log(key, value);
           currentInstance.data[key] = val.getType === dataTypes.function ? val.call(currentInstance.data) : val;
         });
       }

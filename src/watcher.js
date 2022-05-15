@@ -1,4 +1,4 @@
-import { dataTypes, functionTypes, stringTypes } from './types';
+import { dataTypes } from './types';
 
 const watcher = (() => {
   const obj = {
@@ -68,7 +68,6 @@ const watcher = (() => {
 
   function createTarget() {
     [obj.target[`$.${this[0]}`]] = [this[1]];
-    console.log(obj.target);
   }
 
   const handler = {

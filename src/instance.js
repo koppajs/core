@@ -3,6 +3,7 @@ import mediator from './mediator';
 import module from './module';
 import head from './head';
 import watcher from './watcher';
+import { dataTypes, functionTypes, stringTypes } from './types';
 
 const instance = (() => {
   const instances = {};
@@ -212,8 +213,10 @@ const instance = (() => {
       currentInstance.slots = {};
 
       currentInstance.reConnect = () => {
-        currentInstance.isUpdating = true;
-        currentInstance.element.replaceWith(currentInstance.html);
+        if (!currentInstance.isUpdating) {
+          currentInstance.isUpdating = true;
+          currentInstance.element.replaceWith(currentInstance.html);
+        }
       };
 
       currentInstance.element.currentInstanceId = currentInstance.id;
@@ -294,8 +297,10 @@ const instance = (() => {
       });
 
       if (script.comp) {
-        Object.values(script.comp).forEach((item) => {
-          currentInstance.data[item.name] = item.call(currentInstance.data);
+        Object.entries(script.comp).forEach((entry) => {
+          const [key, val] = entry;
+          console.log(key, value);
+          currentInstance.data[key] = val.getType === dataTypes.function ? val.call(currentInstance.data) : val;
         });
       }
 
@@ -303,7 +308,6 @@ const instance = (() => {
       currentInstance.data = Object.assign(currentInstance.data, script.methods);
 
       if (script.watching) {
-        // currentInstance.watching = buildWatchings(currentInstance, script.watching);
         currentInstance.watching = script.watching;
         watcher.add = currentInstance;
       }

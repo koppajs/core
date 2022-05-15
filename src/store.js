@@ -1,4 +1,4 @@
-const store = () => {
+const store = (koppa) => {
   const storage = (bindStorage) => {
     const set = (key, value) => (key && value ? bindStorage.setItem(key, JSON.stringify(value)) : null);
     const exists = (key) => (!!(key && bindStorage.getItem(key)));
@@ -21,9 +21,14 @@ const store = () => {
     };
   };
 
+  const state = { lol: 'hallo' };
+
+  koppa.watcher.createTarget = ['store.state', state];
+
   return {
     local: storage(localStorage),
-    session: storage(sessionStorage)
+    session: storage(sessionStorage),
+    state
   };
 };
 

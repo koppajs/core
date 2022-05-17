@@ -172,6 +172,17 @@ const instance = (() => {
     });
   }
 
+  function isParentInstanceUpdating(startInstance) {
+    let parent = startInstance.parent;
+    
+    while(!parent.isUpdating) {
+      if (parent.parent) break;
+      parent = parent.parent;
+    }
+
+    return parent.isUpdating;
+  }
+
   return new Proxy(instances, {
     get: (target, property) => target[property],
     set: async (target, property, value) => {
@@ -194,7 +205,7 @@ const instance = (() => {
       currentInstance.slots = {};
 
       currentInstance.reConnect = () => {
-        if (!currentInstance.isUpdating) {
+        if (!currentInstance.isUpdating && !isParentInstanceUpdating(currentInstance)) {
           currentInstance.isUpdating = true;
           currentInstance.element.replaceWith(currentInstance.html);
         }
@@ -289,7 +300,7 @@ const instance = (() => {
 
       if (script.watching) {
         currentInstance.watching = script.watching;
-        watcher.add = currentInstance;
+        watcher.add(currentInstance);
       }
 
       // build instance methods

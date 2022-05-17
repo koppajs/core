@@ -1,11 +1,8 @@
 import { dataTypes } from './types';
 
 const watcher = (() => {
-  const obj = {
-    target: {},
-    handler: {},
-    refs: {}
-  };
+  const target = {};
+  const refs = {};
 
   function dataWatchHandler(propName, oldVal, newVal) {
     if (oldVal !== newVal) {
@@ -24,8 +21,8 @@ const watcher = (() => {
     if (oldVal !== newVal) {
       const timeout = setTimeout(() => {
         clearTimeout(timeout);
-        Object.values(this).forEach((ref) => {
-          ref.reConnect();
+        Object.values(this).forEach((item) => {
+          item.reConnect();
         });
       }, 2);
 
@@ -35,67 +32,48 @@ const watcher = (() => {
     return oldVal;
   }
 
-  function add() {
-    this.watching.forEach((item) => {
+  function add(instance) {
+    instance.watching.forEach((item) => {
       if (item.getType === dataTypes.string) {
-        if (item.startsWith('$')) { // store watchings
-          Object.keys(obj.target).forEach((targetItem) => {
+        if (item.startsWith('$')) { // external watchings
+          Object.keys(target).forEach((targetItem) => {
             if (item.startsWith(targetItem)) {
-              if (!obj.refs[targetItem]) obj.refs[targetItem] = [];
-              if (!obj.refs[targetItem].includes(this)) obj.refs[targetItem].push(this);
-              const itemArray = item.replace(`${targetItem}.`, '').split('.');
+              if (!refs[targetItem]) refs[targetItem] = [];
+              const innerItem = item.replace(`${targetItem}.`, '');
+              if (!refs[targetItem][innerItem]) refs[targetItem][innerItem] = [];
+              const innerRefs = refs[targetItem][innerItem];
+              if (!innerRefs.includes(instance)) innerRefs.push(instance);
+              const itemArray = innerItem.split('.');
               if (itemArray.length === 1) {
-                obj.target[targetItem].watch(itemArray[0], externalWatchHandler.bind(obj.refs[targetItem]));
+                target[targetItem].watch(itemArray[0], externalWatchHandler.bind(innerRefs));
               } else {
                 const itemKey = itemArray.pop();
-                Object.byString(obj.target[targetItem], itemArray.join('.'))
-                  .watch(itemKey, externalWatchHandler.bind(obj.refs[targetItem]));
+                Object.byString(target[targetItem], itemArray.join('.'))
+                  .watch(itemKey, externalWatchHandler.bind(innerRefs));
               }
             }
           });
         } else {
           const itemArray = item.split('.');
           if (itemArray.length === 1) { // data
-            this.data.watch(itemArray[0], dataWatchHandler.bind(this));
+            instance.data.watch(itemArray[0], dataWatchHandler.bind(instance));
           } else { // deep nested in data
             const itemKey = itemArray.pop();
-            Object.byString(this.data, itemArray.join('.')).watch(itemKey, dataWatchHandler.bind(this));
+            Object.byString(instance.data, itemArray.join('.')).watch(itemKey, dataWatchHandler.bind(instance));
           }
         }
       }
     });
   }
 
-  function createTarget() {
-    [obj.target[`$.${this[0]}`]] = [this[1]];
+  function createTarget(newTarget) {
+    [target[`$.${newTarget[0]}`]] = [newTarget[1]];
   }
 
-  const handler = {
-    get: (target, property) => {
-      target[property] = (property in target) ? target[property] : {};
-
-      if (typeof target[property] === 'object') {
-        return new Proxy(target[property], handler);
-      }
-
-      return target[property];
-    },
-    set: async (target, property, value) => {
-      switch (property) {
-      case 'add':
-        add.call(value);
-        break;
-      case 'createTarget':
-        createTarget.call(value);
-        break;
-      default:
-        console.error(`property "${property}" of watcher not allowed`);
-        break;
-      }
-    }
-  };
-
-  return new Proxy(obj, handler);
+  return {
+    add,
+    createTarget
+  }
 })();
 
 export default watcher;

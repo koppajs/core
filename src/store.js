@@ -21,9 +21,15 @@ const store = (koppa) => {
     };
   };
 
-  const state = { lol: 'hallo' };
+  const state = {
+    lol: 'hallo',
+    cool: {
+      test1: 'mega',
+      test2: 'bingo'
+    }
+  };
 
-  koppa.watcher.createTarget = ['store.state', state];
+  koppa.watcher.createTarget(['store.state', state]);
 
   return {
     local: storage(localStorage),

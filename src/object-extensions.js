@@ -143,8 +143,7 @@ const objectExtensions = {
   byString: {
     get() {
       return (obj, strg) => {
-        let s = strg.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
-        s = s.replace(/^\./, ''); // strip a leading dot
+        let s = strg.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, ''); // convert indexes to properties
         const a = s.split('.');
         let o = obj;
 

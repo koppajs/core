@@ -112,6 +112,7 @@ const instance = (() => {
     return newVal;
   }
 
+  // binding
   function createMethodBindings(obj, data) {
     if (!obj) return null;
     const o = {};

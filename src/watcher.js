@@ -19,12 +19,20 @@ const watcher = (() => {
 
   function externalWatchHandler(propName, oldVal, newVal) {
     if (oldVal !== newVal) {
-      const timeout = setTimeout(() => {
-        clearTimeout(timeout);
-        Object.values(this).forEach((item) => {
-          item.reConnect();
-        });
-      }, 2);
+      const playTimeout = (refIdentifier) => {
+        const timeout = setTimeout(() => {
+          clearTimeout(timeout);
+          refs[refIdentifier]?.forEach((item) => {
+            item.reConnect();
+          });
+        }, 2);
+      };
+
+      let refIdentifier = this;
+      while (refIdentifier !== '$') {
+        playTimeout(refIdentifier);
+        refIdentifier = refIdentifier.substr(0, refIdentifier.lastIndexOf('.'));
+      }
 
       return newVal;
     }
@@ -32,27 +40,36 @@ const watcher = (() => {
     return oldVal;
   }
 
+  function findTarget(searchStrg) {
+    return Object.keys(target).filter((item) => searchStrg.startsWith(item))[0];
+  }
+
+  function addWatchRef(newRef, instance) {
+    if (!refs[newRef]) refs[newRef] = [];
+    if (!refs[newRef]?.includes(instance)) refs[newRef]?.push(instance);
+  }
+
   function add(instance) {
     instance.watching.forEach((item) => {
       if (item.getType === dataTypes.string) {
         if (item.startsWith('$')) { // external watchings
-          Object.keys(target).forEach((targetItem) => {
-            if (item.startsWith(targetItem)) {
-              if (!refs[targetItem]) refs[targetItem] = [];
-              const innerItem = item.replace(`${targetItem}.`, '');
-              if (!refs[targetItem][innerItem]) refs[targetItem][innerItem] = [];
-              const innerRefs = refs[targetItem][innerItem];
-              if (!innerRefs.includes(instance)) innerRefs.push(instance);
-              const itemArray = innerItem.split('.');
-              if (itemArray.length === 1) {
-                target[targetItem].watch(itemArray[0], externalWatchHandler.bind(innerRefs));
-              } else {
-                const itemKey = itemArray.pop();
-                Object.byString(target[targetItem], itemArray.join('.'))
-                  .watch(itemKey, externalWatchHandler.bind(innerRefs));
-              }
+          const curTargetObjPath = findTarget(item);
+          const curTargetObj = target[findTarget(item)];
+          const curItemPath = item.replace(new RegExp(`^\\${curTargetObjPath}.?`), '');
+          const curItemPathArray = curItemPath.split('.');
+          const curItemName = curItemPathArray.pop();
+          const curParentItemPath = curItemPathArray.join('.');
+
+          addWatchRef(`${curTargetObjPath}${curItemPath ? `.${curItemPath}` : ''}`, instance);
+
+          if (curItemPath) {
+            if (curParentItemPath) { // items thath deeper nested as one lvl
+              Object.byString(curTargetObj, curParentItemPath)
+                .watch(curItemName, externalWatchHandler.bind(item));
+            } else { // items in first nested lvl
+              curTargetObj.watch(curItemName, externalWatchHandler.bind(item));
             }
-          });
+          }
         } else {
           const itemArray = item.split('.');
           if (itemArray.length === 1) { // data
@@ -73,7 +90,7 @@ const watcher = (() => {
   return {
     add,
     createTarget
-  }
+  };
 })();
 
 export default watcher;

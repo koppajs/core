@@ -174,9 +174,9 @@ const instance = (() => {
   }
 
   function isParentInstanceUpdating(startInstance) {
-    let parent = startInstance.parent;
-    
-    while(!parent.isUpdating) {
+    let { parent } = startInstance;
+
+    while (!parent.isUpdating) {
       if (parent.parent) break;
       parent = parent.parent;
     }

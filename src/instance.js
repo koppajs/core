@@ -2,6 +2,8 @@ import utils from './utils';
 import mediator from './mediator';
 import module from './module';
 import head from './head';
+import watcher from './watcher';
+import { dataTypes } from './types';
 
 const instance = (() => {
   const instances = {};
@@ -61,24 +63,6 @@ const instance = (() => {
     });
   }
 
-  function watchHandler(propName, oldVal, newVal) {
-    // when its changed
-    if (oldVal !== newVal) {
-      const timeout = setTimeout(() => {
-        clearTimeout(timeout);
-        this.reConnect();
-      }, 2);
-    }
-
-    return newVal;
-  }
-
-  function buildWatchings(currentInstance, watching) {
-    watching?.forEach((item) => currentInstance.data.watch(item, watchHandler.bind(currentInstance)));
-
-    return watching;
-  }
-
   function firstOfPropChain(curInst, propName) {
     if (curInst.parent?.data[propName] !== undefined
       && curInst.parent?.childProps?.[curInst.id]?.[propName] !== undefined) {
@@ -128,6 +112,7 @@ const instance = (() => {
     return newVal;
   }
 
+  // binding
   function createMethodBindings(obj, data) {
     if (!obj) return null;
     const o = {};
@@ -188,6 +173,17 @@ const instance = (() => {
     });
   }
 
+  function isParentInstanceUpdating(startInstance) {
+    let { parent } = startInstance;
+
+    while (!parent.isUpdating) {
+      if (parent.parent) break;
+      parent = parent.parent;
+    }
+
+    return parent.isUpdating;
+  }
+
   return new Proxy(instances, {
     get: (target, property) => target[property],
     set: async (target, property, value) => {
@@ -210,8 +206,10 @@ const instance = (() => {
       currentInstance.slots = {};
 
       currentInstance.reConnect = () => {
-        currentInstance.isUpdating = true;
-        currentInstance.element.replaceWith(currentInstance.html);
+        if (!currentInstance.isUpdating && !isParentInstanceUpdating(currentInstance)) {
+          currentInstance.isUpdating = true;
+          currentInstance.element.replaceWith(currentInstance.html);
+        }
       };
 
       currentInstance.element.currentInstanceId = currentInstance.id;
@@ -277,7 +275,7 @@ const instance = (() => {
 
       // build head data
       head.set(script.head || {});
-      
+
       if (!currentInstance.data) {
         currentInstance.data = Object.assign(script.data, currentInstance.props);
       } else {
@@ -292,8 +290,9 @@ const instance = (() => {
       });
 
       if (script.comp) {
-        Object.values(script.comp).forEach((item) => {
-          currentInstance.data[item.name] = item.call(currentInstance.data);
+        Object.entries(script.comp).forEach((entry) => {
+          const [key, val] = entry;
+          currentInstance.data[key] = val.getType === dataTypes.function ? val.call(currentInstance.data) : val;
         });
       }
 
@@ -301,7 +300,8 @@ const instance = (() => {
       currentInstance.data = Object.assign(currentInstance.data, script.methods);
 
       if (script.watching) {
-        currentInstance.watching = buildWatchings(currentInstance, script.watching);
+        currentInstance.watching = script.watching;
+        watcher.add(currentInstance);
       }
 
       // build instance methods

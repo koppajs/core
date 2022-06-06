@@ -8,6 +8,8 @@ import instance from './instance';
 import component from './component';
 import head from './head';
 
+import watcher from './watcher';
+
 import fetcher from './fetcher';
 import store from './store';
 import router from './router';
@@ -52,12 +54,13 @@ export default (() => {
           getIdent: utils.getIdent,
           createTrigger: utils.createTrigger
         },
-        head,
         module,
-        component,
-        instance,
         transformer,
         mediator,
+        instance,
+        component,
+        head,
+        watcher,
         take
       };
 

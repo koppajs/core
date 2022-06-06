@@ -155,17 +155,17 @@ const DOMExtensions = {
   createHTML: {
     get() {
       return (html) => {
-        const placeholder = document.createElement("div");
+        const placeholder = document.createElement('div');
         placeholder.innerHTML = html;
 
-        if(placeholder.children.length === 1) return placeholder.firstElementChild;
+        if (placeholder.children.length === 1) return placeholder.firstElementChild;
 
-        nodes = [];
+        const nodes = [];
 
-        while(placeholder.firstElementChild) {
+        while (placeholder.firstElementChild) {
           nodes.push(placeholder.firstElementChild);
         }
-        
+
         return nodes;
       };
     }

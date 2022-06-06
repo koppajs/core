@@ -33,11 +33,9 @@ const utils = (() => {
   };
 
   const replaceData = (strg, data) => strg.replace(/\{\{([^{{}}]*)\}\}/g, (m, c) => {
-    if (c[0] === ':') {
-      return `{{${c.substr(1)}}}`;
-    }
-    const declarations = `const ${Object.keys(data).map((item) => `${item} = data['${item}']`).join('; const ')};`;
-    let ret = eval(`try { ${declarations} ${c} } catch { 'undefined' }`);
+    if (c[0] === ':') return `{{${c.substr(1)}}}`;
+
+    let ret = eval(`try { data.${c} } catch { 'undefined' }`);
 
     if (ret?.isFunction) ret = ret.call(data);
     else if (ret === null) ret = 'null';

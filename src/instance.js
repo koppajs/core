@@ -292,7 +292,8 @@ const instance = (() => {
       if (script.comp) {
         Object.entries(script.comp).forEach((entry) => {
           const [key, val] = entry;
-          currentInstance.data[key] = val.getType === dataTypes.function ? val.call(currentInstance.data) : val;
+
+          currentInstance.data[key] = val?.getType === dataTypes.function ? val.call(currentInstance.data) : val;
         });
       }
 

@@ -1,4 +1,4 @@
-const router = ($) => {
+function router() {
   const routes = [];
   let currentRoute = null;
 
@@ -59,7 +59,7 @@ const router = ($) => {
   };
 
   // routingHandler manage the content change inside the router view and component refinding
-  async function routingHandler(instance) {
+  const routingHandler = async (node, instance) => {
     const route = findRoute();
     let currentComponent = true;
 
@@ -83,11 +83,11 @@ const router = ($) => {
       }
 
       if (currentComponent.isString) {
-        if ($.component[currentComponent] === undefined) {
+        if (this.component[currentComponent] === undefined) {
           currentComponent = 'error-404';
-          this.html(`<${currentComponent}></${currentComponent}>`);
+          node.html(`<${currentComponent}></${currentComponent}>`);
         } else {
-          this.html(`<${currentComponent}></${currentComponent}>`);
+          node.html(`<${currentComponent}></${currentComponent}>`);
         }
       }
     } else {
@@ -95,13 +95,13 @@ const router = ($) => {
       this.html(`<${currentComponent}></${currentComponent}>`);
     }
     currentRoute = route;
-  }
+  };
 
-  function setListener(instance) {
+  const setListener = (node, instance) => {
     window.addEventListener('popstate', async () => {
-      await routingHandler.call(this, instance);
+      await routingHandler(node, instance);
     }, true);
-  }
+  };
 
   const add = (route) => {
     let isAdded = false;
@@ -136,19 +136,19 @@ const router = ($) => {
 
   const getParams = () => currentRoute.params;
 
-  $.mediator.add('connected', async (node) => {
+  this.mediator.add('connected', async (node) => {
     if (node.localName === 'router-view') {
-      const instance = $.instance[node.instanceId];
+      const instance = this.instance[node.instanceId];
 
-      setListener.call(node, instance);
+      setListener(node, instance);
       if (instance.data.$obj) {
         grabRoutes(instance.data[instance.data.$obj].routes);
-        await routingHandler.call(node, instance); // first run
+        await routingHandler(node, instance); // first run
       }
     }
   });
 
-  $.mediator.add('after', () => {
+  this.mediator.add('after', () => {
     document.querySelectorAll('[push]').forEach((node) => {
       node.attr('href', node.attr('push'));
       node.removeAttribute('push');
@@ -159,7 +159,7 @@ const router = ($) => {
     });
   });
 
-  $.take('router-view', '<template></template><script></script><style></style>');
+  this.take('router-view', '<template></template><script></script><style></style>');
 
   return {
     add,
@@ -170,6 +170,6 @@ const router = ($) => {
     clearSlashes,
     urlBuilder
   };
-};
+}
 
 export default router;

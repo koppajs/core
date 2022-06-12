@@ -1,4 +1,6 @@
 import binder from './binder';
+import module from './module';
+import component from './component';
 
 /* eslint no-eval: 0 */
 
@@ -56,13 +58,32 @@ const utils = (() => {
     triggers[name] = { type, target: target || 'body' };
   };
 
+  /**
+   * Creates Modules, Components on different ways
+   *
+   * @param arg1
+   * @param arg2
+   * @returns {Promise<void>}
+   */
+  const take = async (arg1, arg2) => {
+    if (arg1.isFunction) { // module
+      module[arg1.name] = arg1;
+    } else if (arg2.match(/^\.\/[a-z0-9_@\-^!#$%&+={}./\\[\]]+\.html/)) { // html file
+      const response = await module.fetcher.get(arg2);
+      component[arg1] = response.content;
+    } else { // component
+      component[arg1] = arg2;
+    }
+  };
+
   return {
     getId,
     getIdent,
     replaceData,
     buildTrigger,
     binder,
-    createTrigger
+    createTrigger,
+    take
   };
 })();
 

@@ -83,9 +83,10 @@ const watcher = (() => {
     });
   }
 
-  function createTarget(newTarget) {
-    [target[`$.${newTarget[0]}`]] = [newTarget[1]];
-  }
+  const createTarget = (path, obj) => {
+    target[`$.${path}`] = obj;
+    return obj;
+  };
 
   return {
     add,

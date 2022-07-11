@@ -1,6 +1,7 @@
 import binder from './binder';
 import module from './module';
 import component from './component';
+import { dataTypes } from './types';
 
 /* eslint no-eval: 0 */
 
@@ -8,6 +9,7 @@ const utils = (() => {
   const usedIds = [];
   const customEvents = {};
   const triggers = {};
+  const extensions = {}; // script Extensions
 
   const getId = () => { // generate custom id
     const max = 99999999;
@@ -76,6 +78,29 @@ const utils = (() => {
     }
   };
 
+  const addExtension = (name, type) => {
+    extensions[name] = type;
+  };
+
+  const buildExtensions = (script, data) => {
+    const builded = {};
+
+    Object.entries(extensions).forEach(([key, value]) => {
+      if (script[key]) {
+        switch (value) {
+          case dataTypes.function:
+            builded[key] = script[key].bind(data);
+            break;
+          default:
+            builded[key] = script[key];
+            break;
+        }
+      }
+    });
+
+    return builded;
+  };
+
   return {
     getId,
     getIdent,
@@ -83,7 +108,10 @@ const utils = (() => {
     buildTrigger,
     binder,
     createTrigger,
-    take
+    take,
+    addExtension,
+    buildExtensions,
+    dataTypes
   };
 })();
 

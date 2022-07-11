@@ -29,14 +29,14 @@ const head = (() => {
 
   // sort nodes in DOM
   Object.keys(nodes).forEach((item) => {
-    if(nodes[item] !== null) {
-      document.head.prepend(nodes[item])
+    if (nodes[item] !== null) {
+      document.head.prepend(nodes[item]);
     }
   });
 
   const defaultContent = {
     charset: nodes.charset?.attr('charset'),
-    title: nodes.title?.innerHTML ||'>&#8205;',
+    title: nodes.title?.innerHTML || '>&#8205;',
     description: nodes.description?.attr('content'),
     keywords: nodes.keywords?.attr('content'),
     author: nodes.author?.attr('content'),
@@ -63,14 +63,18 @@ const head = (() => {
     });
 
     Object.keys(nodes).forEach((item) => {
-      if(currentContent[item] === false) { // remove
+      if (currentContent[item] === false) { // remove
         nodes[item]?.remove();
-      } else if(currentContent[item] !== false && nodes[item] === null) { // create
+      } else if (currentContent[item] !== false && nodes[item] === null) { // create
         nodes[item] = document.createHTML(templates[item].replace(/{{content}}/, currentContent[item]));
       } else { // update
-        if(item !== 'title' && item !== 'charset') nodes[item].attr('content', currentContent[item]);
-        else if(item === 'charset') nodes[item].attr('charset', currentContent[item]);
-        else if(item === 'title') nodes[item].innerHTML = currentContent[item];
+        if (item !== 'title' && item !== 'charset') {
+          nodes[item].attr('content', currentContent[item]);
+        } else if (item === 'charset') {
+          nodes[item].attr('charset', currentContent[item]);
+        } else if (item === 'title') {
+          nodes[item].innerHTML = currentContent[item];
+        }
       }
     });
 

@@ -1,7 +1,6 @@
 import utils from './utils';
 import mediator from './mediator';
 import module from './module';
-import head from './head';
 import watcher from './watcher';
 import { dataTypes } from './types';
 
@@ -110,20 +109,6 @@ const instance = (() => {
 
     // update current
     return newVal;
-  }
-
-  // binding
-  function createMethodBindings(obj, data) {
-    if (!obj) return null;
-    const o = {};
-
-    Object.keys(obj).forEach((item) => {
-      if (obj[item].isFunction) {
-        o[item] = obj[item].bind(data);
-      }
-    });
-
-    return o;
   }
 
   function createEventBindings(arr, data) {
@@ -263,18 +248,15 @@ const instance = (() => {
           currentInstance.isStopped = true;
         },
         reConnect: currentInstance.reConnect,
-        head,
         ...module
       };
 
-      // script to currentInstance
-      const script = utils.binder({ $ }, `{ ${component[property]?.script} }`);
       currentInstance.childProps = {};
       currentInstance.props = buildProps(currentInstance);
       buildChildProps(currentInstance);
 
-      // build head data
-      head.set(script.head || {});
+      // script to currentInstance
+      const script = utils.binder({ $ }, `{ ${component[property]?.script} }`);
 
       if (!currentInstance.data) {
         currentInstance.data = Object.assign(script.data, currentInstance.props);
@@ -289,6 +271,7 @@ const instance = (() => {
         }
       });
 
+      // create comp
       if (script.comp) {
         Object.entries(script.comp).forEach((entry) => {
           const [key, val] = entry;
@@ -297,8 +280,17 @@ const instance = (() => {
         });
       }
 
-      currentInstance.methods = createMethodBindings(script.methods, currentInstance.data);
-      currentInstance.data = Object.assign(currentInstance.data, script.methods);
+      // create methods
+      if (script.methods) {
+        Object.entries(script.methods).forEach((entry) => {
+          const [key, val] = entry;
+
+          currentInstance.data[key] = val?.getType === dataTypes.function ? val.bind(currentInstance.data) : val;
+        });
+      }
+
+      // currentInstance.methods = createMethodBindings(script.methods, currentInstance.data);
+      // currentInstance.data = Object.assign(currentInstance.data, script.methods);
 
       if (script.watching) {
         currentInstance.watching = script.watching;
@@ -313,6 +305,11 @@ const instance = (() => {
       currentInstance.updated = script.updated?.bind(currentInstance.data);
 
       currentInstance.events = createEventBindings(script.events, currentInstance.data);
+
+      // build the custom script extensions
+      Object.entries(utils.buildExtensions(script, currentInstance.data)).forEach(([k, v]) => {
+        currentInstance[k] = v;
+      });
 
       if (currentInstance.pre?.isAsync) await currentInstance.pre();
       else currentInstance.pre?.();

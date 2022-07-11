@@ -137,14 +137,19 @@ function router() {
   const getParams = () => currentRoute.params;
 
   this.mediator.add('connected', async (node) => {
-    if (node.localName === 'router-view') {
-      const instance = this.instance[node.instanceId];
+    const instance = this.instance[node.instanceId];
 
+    if (node.localName === 'router-view') {
       setListener(node, instance);
       if (instance.data.$obj) {
         grabRoutes(instance.data[instance.data.$obj].routes);
         await routingHandler(node, instance); // first run
       }
+    }
+
+    if (instance.head) {
+      console.log('instance has a head:', instance.head);
+      // TODO: add head functionalyty.
     }
   });
 
@@ -158,6 +163,8 @@ function router() {
       });
     });
   });
+
+  this.addExtension('head', this.dataTypes.object);
 
   this.take('router-view', '<template></template><script></script><style></style>');
 

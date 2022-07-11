@@ -17,6 +17,8 @@ const module = (() => {
         getId: utils.getId,
         getIdent: utils.getIdent,
         createTrigger: utils.createTrigger,
+        addExtension: utils.addExtension,
+        dataTypes: utils.dataTypes,
         mediator,
         transformer,
         take: utils.take,

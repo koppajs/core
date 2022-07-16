@@ -10,6 +10,93 @@ function router() {
 
   const basePath = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
 
+  // node Header Template
+  const headerTemplates = {
+    charset: '<meta charset="utf-8"/>',
+    title: '<title>{{content}}</title>',
+    description: '<meta name="description" content="{{content}}"/>',
+    keywords: '<meta name="keywords" content="{{content}}"/>',
+    author: '<meta name="author" content="{{content}}"/>',
+    copyright: '<meta name="copyright" content="{{content}}"/>',
+    robots: '<meta name="robots" content="{{content}}"/>',
+    'cache-control': '<meta http-equiv="cache-control" content="{{content}}"/>',
+    expires: '<meta http-equiv="expires" content="{{content}}"/>',
+    refresh: '<meta http-equiv="refresh" content="{{content}}"/>'
+  };
+
+  // find nodes in DOM
+  const headerNodes = {
+    refresh: document.head.querySelector('meta[http-equiv="refresh"]'),
+    expires: document.head.querySelector('meta[http-equiv="expires"]'),
+    'cache-control': document.head.querySelector('meta[http-equiv="cache-control"]'),
+    robots: document.head.querySelector('meta[name="robots"]'),
+    copyright: document.head.querySelector('meta[name="copyright"]'),
+    author: document.head.querySelector('meta[name="author"]'),
+    keywords: document.head.querySelector('meta[name="keywords"]'),
+    description: document.head.querySelector('meta[name="description"]'),
+    title: document.head.querySelector('title'),
+    charset: document.head.querySelector('meta[charset]')
+  };
+
+  // sort nodes in DOM
+  Object.keys(headerNodes).forEach((item) => {
+    if (headerNodes[item] !== null) {
+      document.head.prepend(headerNodes[item]);
+    }
+  });
+
+  const defaultHeaderContent = {
+    charset: headerNodes.charset?.attr('charset'),
+    title: headerNodes.title?.innerHTML || '>&#8205;',
+    description: headerNodes.description?.attr('content'),
+    keywords: headerNodes.keywords?.attr('content'),
+    author: headerNodes.author?.attr('content'),
+    copyright: headerNodes.copyright?.attr('content'),
+    robots: headerNodes.robots?.attr('content'),
+    'cache-control': headerNodes['cache-control']?.attr('content'),
+    expires: headerNodes.expires?.attr('content'),
+    refresh: headerNodes.refresh?.attr('content')
+  };
+
+  let oldHeaderContent = { ...defaultHeaderContent };
+  let currentHeaderContent = { ...defaultHeaderContent };
+
+  const setHeader = (obj) => {
+    oldHeaderContent = currentHeaderContent;
+    currentHeaderContent = {};
+
+    Object.keys(headerNodes).forEach((item) => {
+      if (obj[item] !== undefined && obj[item] === false) {
+        currentHeaderContent[item] = obj[item] || defaultHeaderContent[item] || false;
+      } else {
+        currentHeaderContent[item] = obj[item] || oldHeaderContent[item] || defaultHeaderContent[item] || false;
+      }
+    });
+
+    Object.keys(headerNodes).forEach((item) => {
+      if (currentHeaderContent[item] === false) { // remove
+        headerNodes[item]?.remove();
+      } else if (currentHeaderContent[item] !== false && headerNodes[item] === null) { // create
+        headerNodes[item] = document.createHTML(headerTemplates[item].replace(
+          /{{content}}/,
+          currentHeaderContent[item]
+        ));
+      } else { // update
+        if (item !== 'title' && item !== 'charset') {
+          headerNodes[item].attr('content', currentHeaderContent[item]);
+        } else if (item === 'charset') {
+          headerNodes[item].attr('charset', currentHeaderContent[item]);
+        } else if (item === 'title') {
+          headerNodes[item].innerHTML = currentHeaderContent[item];
+        }
+      }
+    });
+
+    currentHeaderContent = Object.fromEntries(Object.entries(currentHeaderContent).filter(([, val]) => val !== false));
+  };
+
+  const getHeader = () => currentHeaderContent;
+
   // remove slasches on bstart and end of string
   const clearSlashes = (val) => val.toString()
     .replace(/\/+/g, '/')
@@ -148,8 +235,7 @@ function router() {
     }
 
     if (instance.head) {
-      console.log('instance has a head:', instance.head);
-      // TODO: add head functionalyty.
+      setHeader(instance.head);
     }
   });
 
@@ -175,7 +261,8 @@ function router() {
     getParams,
     basePath,
     clearSlashes,
-    urlBuilder
+    urlBuilder,
+    getHeader
   };
 }
 

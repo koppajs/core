@@ -3,8 +3,6 @@ import module from './module';
 import component from './component';
 import { dataTypes } from './types';
 
-/* eslint no-eval: 0 */
-
 const utils = (() => {
   const usedIds = [];
   const customEvents = {};
@@ -14,7 +12,13 @@ const utils = (() => {
   const getId = () => { // generate custom id
     const max = 99999999;
     const id = Math.floor(Math.random() * max);
-    return usedIds.includes(id) ? getId() : id;
+
+    if (usedIds.includes(id)) {
+      return getId();
+    } else {
+      usedIds.push(id);
+      return id;
+    }
   };
 
   const getIdent = (ele) => {

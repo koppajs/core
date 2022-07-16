@@ -16,7 +16,10 @@
     "quotes": ["error","single"],
     "semi": ["error","always"],
     "comma-dangle": ["error", "never"],
-    "max-len": ["error", { "code": 120 }],
-    "no-param-reassign": 0
+    "max-len": ["error", { "code": 150 }],
+    "no-param-reassign": 0,
+    "no-eval": 0,
+    "import/no-cycle": 0,
+    "import/no-import-module-exports": 0
   }
 }

@@ -6,6 +6,7 @@ import { dataTypes } from './types';
 const utils = (() => {
   const usedIds = [];
   const customEvents = {};
+  const customEventsDetails = {};
   const triggers = {};
   const extensions = {}; // script Extensions
 
@@ -51,11 +52,17 @@ const utils = (() => {
   });
 
   const buildTrigger = (attr, delegator) => {
-    const attrName = attr.name.substr(1);
+    const attrName = attr.name.substring(1);
 
-    if (!customEvents[attrName]) customEvents[attrName] = new Event(attrName);
+    if (!customEvents[attrName]) {
+      customEventsDetails[attrName] = [];
+      customEvents[attrName] = new CustomEvent(attrName, {
+        detail: () => customEventsDetails[attrName]
+      });
+    }
     const trigger = triggers[attrName];
     delegator.addEventListener(trigger?.type, () => {
+      customEventsDetails[attrName] = attr.value.split(/,\s*/).filter((i) => i !== '');
       document.querySelector(trigger.target).dispatchEvent(customEvents[attrName]);
     });
   };

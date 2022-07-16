@@ -256,7 +256,14 @@ const instance = (() => {
       buildChildProps(currentInstance);
 
       // script to currentInstance
-      const script = utils.binder({ $ }, `{ ${component[property]?.script} }`);
+      let script;
+
+      try {
+        script = utils.binder({ $ }, `{ ${component[property]?.script} }`);
+      } catch (error) {
+        window.console.error(`You have an Error in Script of "${property}" component`);
+        return false;
+      }
 
       if (!currentInstance.data) {
         currentInstance.data = Object.assign(script.data, currentInstance.props);

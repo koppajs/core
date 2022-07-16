@@ -1,5 +1,4 @@
 /* eslint func-names: 0 */
-/* eslint no-eval: 0 */
 
 const binder = function (_____, ____) { // declarations, script
   return eval(`((${Object.keys(_____).map((item) => `${item} = _____.${item}`).join(', ')}) => {

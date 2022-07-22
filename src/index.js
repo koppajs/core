@@ -1,11 +1,7 @@
 import './prototype-extensions';
 
 import utils from './utils';
-import module from './module';
-import transformer from './transformer';
 import mediator from './mediator';
-import instance from './instance';
-import component from './component';
 
 import fetcher from './fetcher';
 import store from './store';
@@ -14,6 +10,11 @@ import router from './router';
 export default (() => {
   let mutate = false;
 
+  /**
+   * Observer to run mediator after html change
+   *
+   * @type {MutationObserver}
+   */
   const observer = new MutationObserver((mutationsList) => {
     mutationsList.forEach(() => {
       // run it once
@@ -33,49 +34,29 @@ export default (() => {
     });
   });
 
+  /**
+   * Run mediator after document is finish loaded and rendered
+   */
   document.onreadystatechange = () => {
     if (document.readyState === 'complete') {
       const timeout = setTimeout(async () => {
         clearTimeout(timeout);
         await mediator.run('after');
-        observer.observe(document.querySelector('body'), { subtree: true, childList: true });
+        observer.observe(document.body, { subtree: true, childList: true });
       }, 200);
     }
   };
 
-  const take = async (arg1, arg2) => { // take module or component
-    if (arg1.isFunction) { // module
-      const moduleArgs = {
-        utils: {
-          getId: utils.getId,
-          getIdent: utils.getIdent,
-          createTrigger: utils.createTrigger
-        },
-        module,
-        component,
-        instance,
-        transformer,
-        mediator,
-        take
-      };
+  // take the standard modules
+  utils.take(fetcher);
+  utils.take(store);
+  utils.take(router);
 
-      const currentModule = arg1.isAsync ? await arg1(moduleArgs) : arg1(moduleArgs);
-      if (currentModule?.isObject) module[arg1.name] = currentModule;
-    } else if (arg2.match(/^\.\/[a-z0-9_@\-^!#$%&+={}./\\[\]]+\.html/)) { // html file
-      const response = await module.fetcher.get(arg2);
-      component[arg1] = response.content;
-    } else { // component
-      component[arg1] = arg2;
-    }
-  };
-
-  take(fetcher);
-  take(store);
-  take(router);
-
+  // create app container element
   const core = (componentName) => document.body.prepend(`<${componentName}></${componentName}>`);
 
-  core.take = take;
+  // add take to make it available from the outside
+  core.take = utils.take;
 
   return core;
 })();

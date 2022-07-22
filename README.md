@@ -61,7 +61,7 @@ and many more...
 # Getting Started
 
 ## For absolute beginners
-You can easy use the **koppa-core.2.0.5.min.js** in your HTML with the **script-tag**.
+You can easy use the **koppa-core.2.0.6.min.js** in your HTML with the **script-tag**.
 
 <br>
 
@@ -72,7 +72,7 @@ index.html
   <head>
     <meta charset="utf-8">
     <title>Get Started with Koppa.js</title>
-    <script src="https://koppajs.s3.eu-central-1.amazonaws.com/koppa-core.2.0.5.min.js"></script>
+    <script src="https://koppajs.s3.eu-central-1.amazonaws.com/koppa-core.2.0.6.min.js"></script>
   </head>
 
   <body>

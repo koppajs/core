@@ -1,7 +1,5 @@
 import utils from './utils';
 
-/* eslint no-eval: 0 */
-
 const mediator = (() => {
   const mediators = {
     connected: [], // when the component is connected

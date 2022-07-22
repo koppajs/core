@@ -1,4 +1,4 @@
-const router = ($) => {
+function router() {
   const routes = [];
   let currentRoute = null;
 
@@ -9,6 +9,93 @@ const router = ($) => {
   const { port } = window.location;
 
   const basePath = `${protocol}//${hostname}${port ? `:${port}` : ''}`;
+
+  // node Header Template
+  const headerTemplates = {
+    charset: '<meta charset="utf-8"/>',
+    title: '<title>{{content}}</title>',
+    description: '<meta name="description" content="{{content}}"/>',
+    keywords: '<meta name="keywords" content="{{content}}"/>',
+    author: '<meta name="author" content="{{content}}"/>',
+    copyright: '<meta name="copyright" content="{{content}}"/>',
+    robots: '<meta name="robots" content="{{content}}"/>',
+    'cache-control': '<meta http-equiv="cache-control" content="{{content}}"/>',
+    expires: '<meta http-equiv="expires" content="{{content}}"/>',
+    refresh: '<meta http-equiv="refresh" content="{{content}}"/>'
+  };
+
+  // find nodes in DOM
+  const headerNodes = {
+    refresh: document.head.querySelector('meta[http-equiv="refresh"]'),
+    expires: document.head.querySelector('meta[http-equiv="expires"]'),
+    'cache-control': document.head.querySelector('meta[http-equiv="cache-control"]'),
+    robots: document.head.querySelector('meta[name="robots"]'),
+    copyright: document.head.querySelector('meta[name="copyright"]'),
+    author: document.head.querySelector('meta[name="author"]'),
+    keywords: document.head.querySelector('meta[name="keywords"]'),
+    description: document.head.querySelector('meta[name="description"]'),
+    title: document.head.querySelector('title'),
+    charset: document.head.querySelector('meta[charset]')
+  };
+
+  // sort nodes in DOM
+  Object.keys(headerNodes).forEach((item) => {
+    if (headerNodes[item] !== null) {
+      document.head.prepend(headerNodes[item]);
+    }
+  });
+
+  const defaultHeaderContent = {
+    charset: headerNodes.charset?.attr('charset'),
+    title: headerNodes.title?.innerHTML || '>&#8205;',
+    description: headerNodes.description?.attr('content'),
+    keywords: headerNodes.keywords?.attr('content'),
+    author: headerNodes.author?.attr('content'),
+    copyright: headerNodes.copyright?.attr('content'),
+    robots: headerNodes.robots?.attr('content'),
+    'cache-control': headerNodes['cache-control']?.attr('content'),
+    expires: headerNodes.expires?.attr('content'),
+    refresh: headerNodes.refresh?.attr('content')
+  };
+
+  let oldHeaderContent = { ...defaultHeaderContent };
+  let currentHeaderContent = { ...defaultHeaderContent };
+
+  const setHeader = (obj) => {
+    oldHeaderContent = currentHeaderContent;
+    currentHeaderContent = {};
+
+    Object.keys(headerNodes).forEach((item) => {
+      if (obj[item] !== undefined && obj[item] === false) {
+        currentHeaderContent[item] = obj[item] || defaultHeaderContent[item] || false;
+      } else {
+        currentHeaderContent[item] = obj[item] || oldHeaderContent[item] || defaultHeaderContent[item] || false;
+      }
+    });
+
+    Object.keys(headerNodes).forEach((item) => {
+      if (currentHeaderContent[item] === false) { // remove
+        headerNodes[item]?.remove();
+      } else if (currentHeaderContent[item] !== false && headerNodes[item] === null) { // create
+        headerNodes[item] = document.createHTML(headerTemplates[item].replace(
+          /{{content}}/,
+          currentHeaderContent[item]
+        ));
+      } else { // update
+        if (item !== 'title' && item !== 'charset') {
+          headerNodes[item].attr('content', currentHeaderContent[item]);
+        } else if (item === 'charset') {
+          headerNodes[item].attr('charset', currentHeaderContent[item]);
+        } else if (item === 'title') {
+          headerNodes[item].innerHTML = currentHeaderContent[item];
+        }
+      }
+    });
+
+    currentHeaderContent = Object.fromEntries(Object.entries(currentHeaderContent).filter(([, val]) => val !== false));
+  };
+
+  const getHeader = () => currentHeaderContent;
 
   // remove slasches on bstart and end of string
   const clearSlashes = (val) => val.toString()
@@ -38,7 +125,7 @@ const router = ($) => {
       route.params = {};
       const pathParts = route.path.split('/');
 
-      if (pathnameParts.length === pathParts.length) {
+      if (JSON.stringify(pathnameParts) === JSON.stringify(pathParts)) {
         pathParts.forEach((value, index) => {
           if (value.charAt(0) === ':') {
             const valueParts = value.slice(1, value.length - 1).split('<');
@@ -59,7 +146,7 @@ const router = ($) => {
   };
 
   // routingHandler manage the content change inside the router view and component refinding
-  async function routingHandler(instance) {
+  const routingHandler = async (node, instance) => {
     const route = findRoute();
     let currentComponent = true;
 
@@ -83,25 +170,25 @@ const router = ($) => {
       }
 
       if (currentComponent.isString) {
-        if ($.component[currentComponent] === undefined) {
+        if (this.component[currentComponent] === undefined) {
           currentComponent = 'error-404';
-          this.html(`<${currentComponent}></${currentComponent}>`);
+          node.html(`<${currentComponent}></${currentComponent}>`);
         } else {
-          this.html(`<${currentComponent}></${currentComponent}>`);
+          node.html(`<${currentComponent}></${currentComponent}>`);
         }
       }
     } else {
       currentComponent = 'error-404';
       this.html(`<${currentComponent}></${currentComponent}>`);
     }
-      currentRoute = route;
-  }
+    
+  currentRoute = route;
 
-  function setListener(instance) {
+  const setListener = (node, instance) => {
     window.addEventListener('popstate', async () => {
-      await routingHandler.call(this, instance);
+      await routingHandler(node, instance);
     }, true);
-  }
+  };
 
   const add = (route) => {
     let isAdded = false;
@@ -136,19 +223,23 @@ const router = ($) => {
 
   const getParams = () => currentRoute.params;
 
-  $.mediator.add('connected', async (node) => {
-    if (node.localName === 'router-view') {
-      const instance = $.instance[node.instanceId];
+  this.mediator.add('connected', async (node) => {
+    const instance = this.instance[node.instanceId];
 
-      setListener.call(node, instance);
+    if (node.localName === 'router-view') {
+      setListener(node, instance);
       if (instance.data.$obj) {
         grabRoutes(instance.data[instance.data.$obj].routes);
-        await routingHandler.call(node, instance); // first run
+        await routingHandler(node, instance); // first run
       }
+    }
+
+    if (instance.head) {
+      setHeader(instance.head);
     }
   });
 
-  $.mediator.add('after', () => {
+  this.mediator.add('after', () => {
     document.querySelectorAll('[push]').forEach((node) => {
       node.attr('href', node.attr('push'));
       node.removeAttribute('push');
@@ -159,7 +250,9 @@ const router = ($) => {
     });
   });
 
-  $.take('router-view', '<template></template><script></script><style></style>');
+  this.addExtension('head', this.dataTypes.object);
+
+  this.take('router-view', '<template></template><script></script><style></style>');
 
   return {
     add,
@@ -168,8 +261,9 @@ const router = ($) => {
     getParams,
     basePath,
     clearSlashes,
-    urlBuilder
+    urlBuilder,
+    getHeader
   };
-};
+}
 
 export default router;

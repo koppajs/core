@@ -1,6 +1,8 @@
 import utils from './utils';
 import mediator from './mediator';
 import module from './module';
+import watcher from './watcher';
+import { dataTypes } from './types';
 
 const instance = (() => {
   const instances = {};
@@ -10,7 +12,7 @@ const instance = (() => {
     const template = document.createElement('template');
     template.innerHTML = templateContent;
 
-    const nodeList = template.content.getNodeList('element', (node) => node.nodeName.includes('-'));
+    const nodeList = template.content.getNodeList('element', (node) => node.localName.includes('-'));
 
     nodeList.forEach((item, index) => {
       nodeList[index].dataset.instance = `${utils.getId()}|${instanceId}`;
@@ -38,7 +40,7 @@ const instance = (() => {
         // add to props
         props[propsName] = currentInstance.parent.data[propsName];
       } else { // it's a direct property string or number
-        [props[propsName]] = [val[1]];
+        [props[propsName]] = [val[1] || true];
       }
 
       currentInstance.element.removeAttribute(item.name);
@@ -58,24 +60,6 @@ const instance = (() => {
 
       childProps[currentInstance.id][propKey] = props[propKey];
     });
-  }
-
-  function watchHandler(propName, oldVal, newVal) {
-    // when its changed
-    if (oldVal !== newVal) {
-      const timeout = setTimeout(() => {
-        clearTimeout(timeout);
-        this.reConnect();
-      }, 2);
-    }
-
-    return newVal;
-  }
-
-  function buildWatchings(currentInstance, watching) {
-    watching?.forEach((item) => currentInstance.data.watch(item, watchHandler.bind(currentInstance)));
-
-    return watching;
   }
 
   function firstOfPropChain(curInst, propName) {
@@ -127,19 +111,6 @@ const instance = (() => {
     return newVal;
   }
 
-  function createMethodBindings(obj, data) {
-    if (!obj) return null;
-    const o = {};
-
-    Object.keys(obj).forEach((item) => {
-      if (obj[item].isFunction) {
-        o[item] = obj[item].bind(data);
-      }
-    });
-
-    return o;
-  }
-
   function createEventBindings(arr, data) {
     if (!arr) return null;
     const a = [];
@@ -187,6 +158,17 @@ const instance = (() => {
     });
   }
 
+  function isParentInstanceUpdating(startInstance) {
+    let { parent } = startInstance;
+
+    while (!parent.isUpdating) {
+      if (parent.parent) break;
+      parent = parent.parent;
+    }
+
+    return parent.isUpdating;
+  }
+
   return new Proxy(instances, {
     get: (target, property) => target[property],
     set: async (target, property, value) => {
@@ -209,8 +191,10 @@ const instance = (() => {
       currentInstance.slots = {};
 
       currentInstance.reConnect = () => {
-        currentInstance.isUpdating = true;
-        currentInstance.element.replaceWith(currentInstance.html);
+        if (!currentInstance.isUpdating && !isParentInstanceUpdating(currentInstance)) {
+          currentInstance.isUpdating = true;
+          currentInstance.element.replaceWith(currentInstance.html);
+        }
       };
 
       currentInstance.element.currentInstanceId = currentInstance.id;
@@ -267,11 +251,19 @@ const instance = (() => {
         ...module
       };
 
-      // script to currentInstance
-      const script = utils.binder({ $ }, `{ ${component[property]?.script} }`);
       currentInstance.childProps = {};
       currentInstance.props = buildProps(currentInstance);
       buildChildProps(currentInstance);
+
+      // script to currentInstance
+      let script;
+
+      try {
+        script = utils.binder({ $ }, `{ ${component[property]?.script} }`);
+      } catch (error) {
+        window.console.error(`You have an Error in Script of "${property}" component`);
+        return false;
+      }
 
       if (!currentInstance.data) {
         currentInstance.data = Object.assign(script.data, currentInstance.props);
@@ -286,19 +278,33 @@ const instance = (() => {
         }
       });
 
+      // create comp
       if (script.comp) {
-        Object.values(script.comp).forEach((item) => {
-          currentInstance.data[item.name] = item.call(currentInstance.data);
+        Object.entries(script.comp).forEach((entry) => {
+          const [key, val] = entry;
+
+          currentInstance.data[key] = val?.getType === dataTypes.function ? val.call(currentInstance.data) : val;
         });
       }
 
-      currentInstance.methods = createMethodBindings(script.methods, currentInstance.data);
-      currentInstance.data = Object.assign(currentInstance.data, script.methods);
+      // create methods
+      if (script.methods) {
+        Object.entries(script.methods).forEach((entry) => {
+          const [key, val] = entry;
 
-      if (script.watching) {
-        currentInstance.watching = buildWatchings(currentInstance, script.watching);
+          currentInstance.data[key] = val?.getType === dataTypes.function ? val.bind(currentInstance.data) : val;
+        });
       }
 
+      // currentInstance.methods = createMethodBindings(script.methods, currentInstance.data);
+      // currentInstance.data = Object.assign(currentInstance.data, script.methods);
+
+      if (script.watching) {
+        currentInstance.watching = script.watching;
+        watcher.add(currentInstance);
+      }
+
+      // build instance methods
       currentInstance.pre = script.pre?.bind(currentInstance.data);
       currentInstance.created = script.created?.bind(currentInstance.data);
       currentInstance.merged = script.merged?.bind(currentInstance.data);
@@ -306,6 +312,11 @@ const instance = (() => {
       currentInstance.updated = script.updated?.bind(currentInstance.data);
 
       currentInstance.events = createEventBindings(script.events, currentInstance.data);
+
+      // build the custom script extensions
+      Object.entries(utils.buildExtensions(script, currentInstance.data)).forEach(([k, v]) => {
+        currentInstance[k] = v;
+      });
 
       if (currentInstance.pre?.isAsync) await currentInstance.pre();
       else currentInstance.pre?.();
@@ -323,7 +334,7 @@ const instance = (() => {
 
       currentInstance.childs = {};
 
-      currentInstance.fragment.getNodeList('element', (node) => node.nodeName.includes('-')).forEach((item) => {
+      currentInstance.fragment.getNodeList('element', (node) => node.localName.includes('-')).forEach((item) => {
         currentInstance.childs[utils.getIdent(item).self] = item;
       });
 
@@ -355,7 +366,7 @@ const instance = (() => {
 
       Reflect.set(target, ident.self, currentInstance);
 
-      return true;
+      return value;
     }
   });
 })();

@@ -9,7 +9,6 @@ const prototypeExtensions = (() => {
     isObject: objectExtensions.isObject,
     isString: objectExtensions.isString,
     isBool: objectExtensions.isBool,
-    isJson: objectExtensions.isJson,
     isFunction: objectExtensions.isFunction,
     isArrow: objectExtensions.isArrow,
     isAsync: objectExtensions.isAsync,
@@ -21,8 +20,13 @@ const prototypeExtensions = (() => {
     watch: objectExtensions.watch
   });
 
+  Object.defineProperties(Object, {
+    byString: objectExtensions.byString
+  });
+
   Object.defineProperties(String.prototype, {
-    getStringType: objectExtensions.getStringType
+    getStringType: objectExtensions.getStringType,
+    isJson: objectExtensions.isJson
   });
 
   Object.defineProperties(Function.prototype, {
@@ -47,6 +51,10 @@ const prototypeExtensions = (() => {
     append: DOMExtensions.append,
     html: DOMExtensions.html,
     attr: DOMExtensions.attr
+  });
+
+  Object.defineProperties(Document.prototype, {
+    createHTML: DOMExtensions.createHTML
   });
 })();
 

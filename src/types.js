@@ -19,15 +19,4 @@ const stringTypes = {
   normal: 'Normal'
 };
 
-/*
-TODO:
-
-Add this types and create is... functions
-
-Null
-Undefined
-Symbol
-Bigint
-*/
-
 export { dataTypes, functionTypes, stringTypes };

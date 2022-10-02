@@ -181,8 +181,8 @@ function router() {
       currentComponent = 'error-404';
       this.html(`<${currentComponent}></${currentComponent}>`);
     }
-    currentRoute = route;
-  };
+    
+  currentRoute = route;
 
   const setListener = (node, instance) => {
     window.addEventListener('popstate', async () => {

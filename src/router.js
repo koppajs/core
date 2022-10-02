@@ -181,20 +181,10 @@ function router() {
       currentComponent = 'error-404';
       this.html(`<${currentComponent}></${currentComponent}>`);
     }
-<<<<<<< Updated upstream
-    
-  currentRoute = route;
-=======
-<<<<<<< Updated upstream
-    currentRoute = route;
-  };
-=======
     
   	currentRoute = route;
   	
   }
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
   const setListener = (node, instance) => {
     window.addEventListener('popstate', async () => {

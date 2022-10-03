@@ -35,7 +35,7 @@ const mediator = (() => {
         elementNodes.forEach((elementNode) => {
           [...elementNode.attributes].forEach((attribute) => {
             if (attribute.name.startsWith('@')) {
-              utils.buildTrigger(attribute, elementNode);
+              utils.addTrigger(attribute, elementNode);
             }
 
             attribute.value = utils.replaceData(attribute.value, instance.data);

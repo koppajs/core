@@ -11,12 +11,10 @@ const module = (() => {
   return new Proxy(modules, {
     get: (target, property) => target[property],
     set: async (target, property, value) => {
-      target[property] = value;
-
-      let currentModule = value.bind({
+     const currentModule = utils.frun(value, {
         getId: utils.getId,
         getIdent: utils.getIdent,
-        createTrigger: utils.createTrigger,
+        defineTrigger: utils.defineTrigger,
         addExtension: utils.addExtension,
         dataTypes: utils.dataTypes,
         mediator,
@@ -28,8 +26,8 @@ const module = (() => {
         watcher
       });
 
-      currentModule = currentModule.isAsync ? await currentModule() : currentModule();
-      if (currentModule?.isObject) target[property] = currentModule;
+      if (currentModule?.isObject)
+        target[property] = currentModule;
 
       return value;
     }

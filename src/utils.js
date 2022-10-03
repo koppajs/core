@@ -51,7 +51,7 @@ const utils = (() => {
     return ret;
   });
 
-  const buildTrigger = (attr, delegator) => {
+  const addTrigger = (attr, delegator) => { // add a defined trigger with arguments
     const attrName = attr.name.substring(1);
 
     if (!customEvents[attrName]) {
@@ -67,7 +67,7 @@ const utils = (() => {
     });
   };
 
-  const createTrigger = (name, type, target) => { // add a trigger set;
+  const defineTrigger = (name, type, target) => { // define trigger
     triggers[name] = { type, target: target || 'body' };
   };
 
@@ -112,16 +112,27 @@ const utils = (() => {
     return builded;
   };
 
+  const frun = async (f, a) => {
+    return f.isAsync
+        ? f.isArrow
+          ? await f(a)
+          : await f.call(a)
+        : f.isArrow
+          ? f(a)
+          : f.call(a);
+  };
+
   return {
     getId,
     getIdent,
     replaceData,
-    buildTrigger,
+    defineTrigger,
+    addTrigger,
     binder,
-    createTrigger,
     take,
     addExtension,
     buildExtensions,
+    frun,
     dataTypes
   };
 })();

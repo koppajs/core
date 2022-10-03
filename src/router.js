@@ -1,4 +1,4 @@
-function router() {
+function router($) {
   const routes = [];
   let currentRoute = null;
 
@@ -125,21 +125,27 @@ function router() {
       route.params = {};
       const pathParts = route.path.split('/');
 
-      if (JSON.stringify(pathnameParts) === JSON.stringify(pathParts)) {
+      if(pathnameParts.length === pathParts.length) {
+        let machCount = 0;
+
         pathParts.forEach((value, index) => {
           if (value.charAt(0) === ':') {
             const valueParts = value.slice(1, value.length - 1).split('<');
             const pattern = new RegExp(valueParts[1], 'g');
             if (pattern.test(pathnameParts[index])) {
               route.params[valueParts[0]] = pathnameParts[index];
+              machCount++;
             }
-          }
-
-          if (index === pathParts.length - 1) {
-            ret = route;
+          } else if(value === pathnameParts[index]) {
+            machCount++;
           }
         });
+        
+        if(machCount === pathnameParts.length) {
+          ret = route;
+        }
       }
+
     });
 
     return ret;
@@ -170,7 +176,7 @@ function router() {
       }
 
       if (currentComponent.isString) {
-        if (this.component[currentComponent] === undefined) {
+        if ($.component[currentComponent] === undefined) {
           currentComponent = 'error-404';
           node.html(`<${currentComponent}></${currentComponent}>`);
         } else {
@@ -179,11 +185,10 @@ function router() {
       }
     } else {
       currentComponent = 'error-404';
-      this.html(`<${currentComponent}></${currentComponent}>`);
+      node.html(`<${currentComponent}></${currentComponent}>`);
     }
     
-  	currentRoute = route;
-  	
+    currentRoute = route;
   }
 
   const setListener = (node, instance) => {
@@ -225,8 +230,8 @@ function router() {
 
   const getParams = () => currentRoute.params;
 
-  this.mediator.add('connected', async (node) => {
-    const instance = this.instance[node.instanceId];
+  $.mediator.add('connected', async (node) => {
+    const instance = $.instance[node.instanceId];
 
     if (node.localName === 'router-view') {
       setListener(node, instance);
@@ -241,7 +246,7 @@ function router() {
     }
   });
 
-  this.mediator.add('after', () => {
+  $.mediator.add('after', () => {
     document.querySelectorAll('[push]').forEach((node) => {
       node.attr('href', node.attr('push'));
       node.removeAttribute('push');
@@ -252,9 +257,9 @@ function router() {
     });
   });
 
-  this.addExtension('head', this.dataTypes.object);
+  $.addExtension('head', $.dataTypes.object);
 
-  this.take('router-view', '<template></template><script></script><style></style>');
+  $.take('router-view', '<template></template><script></script><style></style>');
 
   return {
     add,

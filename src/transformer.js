@@ -1,3 +1,5 @@
+import utils from './utils';
+
 const transformer = (() => {
   const transformers = {
     source: [ // manipulate the source string of every component

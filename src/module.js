@@ -7,11 +7,11 @@ import watcher from './watcher';
 
 const module = (() => {
   const modules = {};
-
+  
   return new Proxy(modules, {
-    get: (target, property) => target[property],
+    get: async (target, property) => target[property],
     set: async (target, property, value) => {
-     const currentModule = utils.frun(value, {
+      const $ = {
         getId: utils.getId,
         getIdent: utils.getIdent,
         defineTrigger: utils.defineTrigger,
@@ -24,10 +24,14 @@ const module = (() => {
         instance,
         component,
         watcher
-      });
+      };
+    
+      const currentModule = value.isAsync ? await value($) : value($);
 
       if (currentModule?.isObject)
-        target[property] = currentModule;
+        // target[property] = currentModule;
+
+        Reflect.set(target, property, currentModule);
 
       return value;
     }

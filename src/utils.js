@@ -51,24 +51,29 @@ const utils = (() => {
     return ret;
   });
 
-  const addTrigger = (attr, delegator) => { // add a defined trigger with arguments
-    const attrName = attr.name.substring(1);
-
-    if (!customEvents[attrName]) {
-      customEventsDetails[attrName] = [];
-      customEvents[attrName] = new CustomEvent(attrName, {
-        detail: () => customEventsDetails[attrName]
-      });
-    }
-    const trigger = triggers[attrName];
-    delegator.addEventListener(trigger?.type, () => {
-      customEventsDetails[attrName] = attr.value.split(/,\s*/).filter((i) => i !== '');
-      document.querySelector(trigger.target).dispatchEvent(customEvents[attrName]);
-    });
-  };
-
   const defineTrigger = (name, type, target) => { // define trigger
     triggers[name] = { type, target: target || 'body' };
+  };
+
+  const addTrigger = (attr, delegator) => { // add a defined trigger with arguments
+    const attrName = attr.name.substring(1);
+    const trigger = triggers[attrName];
+
+    if(trigger) {
+      if (!customEvents[attrName]) {
+        customEventsDetails[attrName] = [];
+        customEvents[attrName] = new CustomEvent(attrName, {
+          detail: () => customEventsDetails[attrName]
+        });
+      }
+      
+      delegator.addEventListener(trigger?.type, () => {
+        customEventsDetails[attrName] = attr.value.split(/,\s*/).filter((i) => i !== '');
+
+        let target = trigger.target.isElement ? trigger.target : document.querySelector(trigger.target);
+        target.dispatchEvent(customEvents[attrName]);
+      });
+    }
   };
 
   /**
@@ -112,16 +117,6 @@ const utils = (() => {
     return builded;
   };
 
-  const frun = async (f, a) => {
-    return f.isAsync
-        ? f.isArrow
-          ? await f(a)
-          : await f.call(a)
-        : f.isArrow
-          ? f(a)
-          : f.call(a);
-  };
-
   return {
     getId,
     getIdent,
@@ -132,7 +127,6 @@ const utils = (() => {
     take,
     addExtension,
     buildExtensions,
-    frun,
     dataTypes
   };
 })();

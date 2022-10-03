@@ -1,4 +1,4 @@
-function store() {
+function store($) {
   const state = {};
 
   const storage = (bindStorage) => {
@@ -24,7 +24,7 @@ function store() {
   };
 
   // create new watch target
-  this.watcher.createTarget('store.state', state);
+  $.watcher.createTarget('store.state', state);
 
   return {
     local: storage(localStorage),

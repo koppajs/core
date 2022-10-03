@@ -116,11 +116,14 @@ const instance = (() => {
     const a = [];
 
     arr.forEach((item) => {
-      if (item[2].isFunction) {
-        a.push([item[0], item[1], item[2].bind(data)]);
+      if (item[0].isString && item[0].charAt(0) === '@' && item[3].isFunction) { // named events but trigger
+        const customName = item[0].substring(1);
+        utils.defineTrigger(customName, item[2], item[1]);
+        a.push([item[1], customName, item[3]]);
+      } else if (item[2].isFunction) {
+        a.push([item[0], item[1], item[2]]);
       }
     });
-
     return a;
   }
 
@@ -247,9 +250,16 @@ const instance = (() => {
         stopRendering: () => {
           currentInstance.isStopped = true;
         },
-        reConnect: currentInstance.reConnect,
-        ...module
+        reConnect: currentInstance.reConnect
       };
+
+      await Object.keys(module).reduce(
+        // p = promise, c = array value
+        (p, c) => p.then(async () => {
+          $[c] = await module[c];
+        }),
+        Promise.resolve(null)
+      );
 
       currentInstance.childProps = {};
       currentInstance.props = buildProps(currentInstance);

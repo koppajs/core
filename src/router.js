@@ -82,6 +82,7 @@ function router($) {
           currentHeaderContent[item]
         ));
       } else { // update
+        // eslint-disable-next-line no-lonely-if
         if (item !== 'title' && item !== 'charset') {
           headerNodes[item].attr('content', currentHeaderContent[item]);
         } else if (item === 'charset') {
@@ -125,7 +126,7 @@ function router($) {
       route.params = {};
       const pathParts = route.path.split('/');
 
-      if(pathnameParts.length === pathParts.length) {
+      if (pathnameParts.length === pathParts.length) {
         let machCount = 0;
 
         pathParts.forEach((value, index) => {
@@ -134,18 +135,17 @@ function router($) {
             const pattern = new RegExp(valueParts[1], 'g');
             if (pattern.test(pathnameParts[index])) {
               route.params[valueParts[0]] = pathnameParts[index];
-              machCount++;
+              machCount += 1;
             }
-          } else if(value === pathnameParts[index]) {
-            machCount++;
+          } else if (value === pathnameParts[index]) {
+            machCount += 1;
           }
         });
-        
-        if(machCount === pathnameParts.length) {
+
+        if (machCount === pathnameParts.length) {
           ret = route;
         }
       }
-
     });
 
     return ret;
@@ -187,9 +187,9 @@ function router($) {
       currentComponent = 'error-404';
       node.html(`<${currentComponent}></${currentComponent}>`);
     }
-    
+
     currentRoute = route;
-  }
+  };
 
   const setListener = (node, instance) => {
     window.addEventListener('popstate', async () => {

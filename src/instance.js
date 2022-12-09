@@ -121,7 +121,7 @@ const instance = (() => {
         utils.defineTrigger(customName, item[2], item[1]);
         a.push([item[1], customName, item[3]]);
       } else if (item[2].isFunction) {
-        a.push([item[0], item[1], item[2]]);
+        a.push([item[0], item[1], item[2].bind(data)]);
       }
     });
     return a;
@@ -173,6 +173,13 @@ const instance = (() => {
   }
 
   return new Proxy(instances, {
+    has: (target, property) => {
+      if (target[property]) {
+        console.log('property not in target');
+        return false;
+      }
+      return true;
+    },
     get: (target, property) => target[property],
     set: async (target, property, value) => {
       const ele = value[0];
@@ -253,13 +260,9 @@ const instance = (() => {
         reConnect: currentInstance.reConnect
       };
 
-      await Object.keys(module).reduce(
-        // p = promise, c = array value
-        (p, c) => p.then(async () => {
-          $[c] = await module[c];
-        }),
-        Promise.resolve(null)
-      );
+      await Object.keys(module)?.asyncEach(async (v) => {
+        $[v] = await module[v];
+      });
 
       currentInstance.childProps = {};
       currentInstance.props = buildProps(currentInstance);
@@ -269,11 +272,13 @@ const instance = (() => {
       let script;
 
       try {
-        script = utils.binder({ $ }, `{ ${component[property]?.script} }`);
+        script = utils.binder({ $ }, `(()=>{${component[property]?.script}})()`);
       } catch (error) {
         window.console.error(`You have an Error in Script of "${property}" component`);
         return false;
       }
+
+      console.log(script);
 
       if (!currentInstance.data) {
         currentInstance.data = Object.assign(script.data, currentInstance.props);
@@ -305,9 +310,6 @@ const instance = (() => {
           currentInstance.data[key] = val?.getType === dataTypes.function ? val.bind(currentInstance.data) : val;
         });
       }
-
-      // currentInstance.methods = createMethodBindings(script.methods, currentInstance.data);
-      // currentInstance.data = Object.assign(currentInstance.data, script.methods);
 
       if (script.watching) {
         currentInstance.watching = script.watching;
@@ -371,8 +373,6 @@ const instance = (() => {
         else currentInstance.updated?.();
         currentInstance.isUpdating = false;
       }
-
-      // target[ident.self] = currentInstance;
 
       Reflect.set(target, ident.self, currentInstance);
 

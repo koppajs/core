@@ -1,20 +1,24 @@
-# Git
+# git
 .git/
 .gitignore
 
-# Node & npm
+# node & npm
 node_modules/
 package-lock.json
 
-# Cache
+# cache
 .cache/
 
-# Ignore IDE configuration files
+# IDE configuration files
 .vscode/
+.idea
 
-# Logs
+# logs
 logs/
 *.log
 
 # OS files
 .DS_Store
+
+# Buildfiles
+dist/

@@ -1,5 +1,3 @@
-import utils from './utils';
-
 const transformer = (() => {
   const transformers = {
     source: [ // manipulate the source string of every component
@@ -21,15 +19,21 @@ const transformer = (() => {
         return source;
       },
       (source) => { // source to part transformer
-        source = new DOMParser().parseFromString(source, 'text/html');
+        const ret = {};
+        const dom = new DOMParser().parseFromString(source, 'text/html');
+        const filter = [
+          ['template', ''],
+          ['script', 'return{data:{}}'],
+          ['style', '']
+        ];
 
-        source = {
-          template: source.children[0].children[0].children[0].innerHTML.trim() || '',
-          script: source.children[0].children[0].children[1].innerHTML.trim() || 'data: {}',
-          style: source.children[0].children[0].children[2].innerHTML.trim() || ''
-        };
+        filter.forEach(([identifier, fallback]) => {
+          ret[identifier] = [...dom.children[0].children[0].children]
+            .filter((node) => node.localName === identifier)
+            .map((node) => node.innerHTML.trim()).join('') || fallback;
+        });
 
-        return source;
+        return ret;
       }
     ]
   };
@@ -39,12 +43,9 @@ const transformer = (() => {
   const run = async (transformerGroup, value) => {
     if (!value) return false;
 
-    await transformers[transformerGroup]?.reduce(
-      (p, c) => p.then(async () => {
-        value = c.isAsync ? await c(value) : c(value);
-      }),
-      Promise.resolve(null)
-    );
+    await transformers[transformerGroup]?.asyncEach(async (v) => {
+      value = v.isAsync ? await v(value) : v(value);
+    });
 
     return value;
   };

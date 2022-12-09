@@ -29,6 +29,10 @@ const prototypeExtensions = (() => {
     isJson: objectExtensions.isJson
   });
 
+  Object.defineProperties(Array.prototype, {
+    asyncEach: objectExtensions.asyncEach
+  });
+
   Object.defineProperties(Function.prototype, {
     getFunctionType: objectExtensions.getFunctionType
   });

@@ -8,7 +8,8 @@ const mediator = (() => {
         instance.fragment.getNodeList('element', (node) => node.hasAttribute('loop')).forEach((loopNode) => {
           const attr = utils.replaceData(loopNode.getAttribute('loop'), instance.data).split(' in ');
           loopNode.removeAttribute('loop');
-          const data = utils.binder(instance.data, `(() => ${attr[1]})()`);
+          console.log(attr[1]);
+          const data = utils.binder(instance.data, `(()=>${attr[1]})()`);
           let ret = '';
 
           if (data) {
@@ -82,13 +83,10 @@ const mediator = (() => {
   const add = async (mediatorGroup, mediatorCallback) => mediators[mediatorGroup].push(mediatorCallback);
 
   const run = async (mediatorGroup, mediatorValue) => {
-    await mediators[mediatorGroup]?.reduce(
-      (p, c) => p.then(async () => {
-        if (c.isAsync) await c(mediatorValue);
-        else c(mediatorValue);
-      }),
-      Promise.resolve(null)
-    );
+    await mediators[mediatorGroup]?.asyncEach(async (v) => {
+      if (v.isAsync) await v(mediatorValue);
+      else v(mediatorValue);
+    });
   };
 
   return {

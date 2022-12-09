@@ -6,6 +6,13 @@ const component = (() => {
   const components = {};
 
   return new Proxy(components, {
+    has: (target, property) => {
+      if (target[property]) {
+        window.console.error('property not in target');
+        return false;
+      }
+      return true;
+    },
     get: (target, property) => target[property],
     set: async (target, property, value) => {
       // source transformation

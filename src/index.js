@@ -57,6 +57,7 @@ export default (() => {
 
   // add take to make it available from the outside
   core.take = utils.take;
+  core.version = '2.0.7';
 
   return core;
 })();

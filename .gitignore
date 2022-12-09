@@ -1,16 +1,19 @@
-# Git
+# git
 .git/
 
-# Node & npm
+# node & npm
 node_modules/
 package-lock.json
 
-# Cache
+# cache
 .cache/
 
-# Logs
+# logs
 logs/
 *.log
 
 # OS files
 .DS_Store
+
+# Buildfiles
+dist/

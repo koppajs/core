@@ -143,7 +143,7 @@ const objectExtensions = {
   byString: {
     get() {
       return (obj, strg) => {
-        let s = strg.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, ''); // convert indexes to properties
+        const s = strg.replace(/\[(\w+)\]/g, '.$1').replace(/^\./, ''); // convert indexes to properties
         const a = s.split('.');
         let o = obj;
 
@@ -157,6 +157,17 @@ const objectExtensions = {
         }
 
         return o;
+      };
+    }
+  },
+
+  asyncEach: {
+    get() {
+      return async (f) => {
+        this.reduce(
+          async (p, v) => p.then(await f(v)),
+          Promise.resolve(null)
+        );
       };
     }
   }

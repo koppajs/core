@@ -7,8 +7,15 @@ import watcher from './watcher';
 
 const module = (() => {
   const modules = {};
-  
+
   return new Proxy(modules, {
+    has: (target, property) => {
+      if (target[property]) {
+        window.console.error('property not in target');
+        return false;
+      }
+      return true;
+    },
     get: async (target, property) => target[property],
     set: async (target, property, value) => {
       const $ = {
@@ -25,13 +32,9 @@ const module = (() => {
         component,
         watcher
       };
-    
+
       const currentModule = value.isAsync ? await value($) : value($);
-
-      if (currentModule?.isObject)
-        // target[property] = currentModule;
-
-        Reflect.set(target, property, currentModule);
+      if (currentModule?.isObject) Reflect.set(target, property, currentModule);
 
       return value;
     }
